@@ -3,103 +3,189 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<meta name="theme-color" content="#0f172a" />
+<meta name="theme-color" content="#059669" />
 <title>SwatGo Merchant</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLf8FDyUoWTFsiMu20azhnscWkiyCDE24"></script>
 <style>
-:root { --primary: #0f172a; --accent: #f59e0b; --success: #22c55e; --danger: #ef4444; --bg: #f1f5f9; --card: #ffffff; --text: #0f172a; --text-light: #64748b; --border: #e2e8f0; }
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-body { background: var(--bg); display: flex; justify-content: center; min-height: 100vh; }
-.app { width: 100%; max-width: 480px; background: var(--bg); min-height: 100vh; position: relative; padding-bottom: 75px; }
-#splash { position: fixed; inset: 0; background: var(--primary); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s; }
-#splash h1 { font-size: 32px; letter-spacing: 3px; margin-bottom: 10px; }
-#splash .loader { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin-top: 20px; }
+:root {
+  --brand: #059669;
+  --brand-dark: #047857;
+  --brand-light: #D1FAE5;
+  --accent: #F59E0B;
+  --accent-light: #FEF3C7;
+  --success: #10B981;
+  --danger: #EF4444;
+  --info: #3B82F6;
+  --bg: #F8FAFC;
+  --card: #FFFFFF;
+  --text: #0F172A;
+  --text-light: #64748B;
+  --text-soft: #94A3B8;
+  --border: #E2E8F0;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 40px rgba(0,0,0,0.08);
+  --radius: 18px;
+  --radius-sm: 12px;
+  --input-bg: #FFFFFF;
+}
+body.dark {
+  --bg: #0F172A;
+  --card: #1E293B;
+  --text: #F1F5F9;
+  --text-light: #94A3B8;
+  --text-soft: #64748B;
+  --border: #334155;
+  --input-bg: #1E293B;
+  --brand-light: rgba(5, 150, 105, 0.2);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+body { background: var(--bg); display: flex; justify-content: center; min-height: 100vh; color: var(--text); transition: background 0.3s; }
+.app { width: 100%; max-width: 480px; background: var(--bg); min-height: 100vh; position: relative; padding-bottom: 88px; }
+
+#splash { position: fixed; inset: 0; background: linear-gradient(135deg, #059669, #047857); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s; }
+#splash h1 { font-size: 38px; font-weight: 800; letter-spacing: -1px; margin-bottom: 6px; animation: splashIn 0.6s ease; }
+#splash p { color: rgba(255,255,255,0.85); font-size: 14px; font-weight: 500; animation: splashIn 0.8s ease; }
+#splash .loader { width: 32px; height: 32px; border: 3px solid rgba(255,255,255,0.25); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; margin-top: 28px; }
 @keyframes spin { to { transform: rotate(360deg); } }
-@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-.topbar { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: var(--primary); color: #fff; position: sticky; top: 0; z-index: 10; }
-.topbar h1 { font-size: 18px; }
-.topbar .status { font-size: 11px; padding: 5px 12px; border-radius: 20px; background: rgba(255,255,255,0.15); cursor: pointer; font-weight: 600; }
-.topbar .status.open { background: var(--success); }
-main { padding: 16px; }
-h2 { font-size: 18px; margin-bottom: 12px; color: var(--text); font-weight: 600; }
-h3 { font-size: 16px; color: var(--text); }
-p { font-size: 13px; color: var(--text-light); }
-.card { background: var(--card); border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.02); }
-.bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 480px; display: flex; justify-content: space-around; background: #fff; border-top: 1px solid var(--border); padding: 10px 0; z-index: 100; }
-.bottom-nav button { background: none; border: none; display: flex; flex-direction: column; align-items: center; font-size: 20px; color: #94a3b8; cursor: pointer; position: relative; flex: 1; padding: 4px; }
-.bottom-nav button span.lbl { font-size: 10px; margin-top: 4px; font-weight: 500; }
-.bottom-nav button.active { color: var(--primary); font-weight: 700; }
-.badge { position: absolute; top: -2px; right: 22%; background: var(--danger); color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: bold; border: 2px solid #fff; }
+@keyframes splashIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+.topbar { padding: 16px 20px; background: linear-gradient(135deg, #059669 0%, #047857 100%); color: #fff; position: sticky; top: 0; z-index: 10; overflow: hidden; }
+.topbar::after { content: ''; position: absolute; top: -60px; right: -60px; width: 160px; height: 160px; background: rgba(255,255,255,0.08); border-radius: 50%; pointer-events: none; }
+.topbar::before { content: ''; position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: rgba(255,255,255,0.06); border-radius: 50%; pointer-events: none; }
+.topbar-top { display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2; gap: 10px; }
+.store-name-top { font-size: 11px; opacity: 0.85; font-weight: 500; margin-bottom: 2px; }
+.topbar h1 { font-size: 18px; font-weight: 800; letter-spacing: -0.4px; }
+.open-toggle { font-size: 11px; font-weight: 700; padding: 6px 14px; border-radius: 20px; background: rgba(255,255,255,0.18); cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
+.open-toggle.open { background: var(--accent); border-color: var(--accent); }
+
+main { padding: 18px 16px; }
+h2 { font-size: 17px; margin-bottom: 12px; color: var(--text); font-weight: 800; letter-spacing: -0.3px; display: flex; align-items: center; gap: 6px; }
+h3 { font-size: 15px; color: var(--text); font-weight: 700; }
+p { font-size: 13px; color: var(--text-light); line-height: 1.5; }
+.card { background: var(--card); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow-md); position: relative; overflow: hidden; border: 1px solid rgba(226,232,240,0.5); animation: cardIn 0.4s ease backwards; }
+@keyframes cardIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+.bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 480px; display: flex; justify-content: space-around; background: var(--card); border-top: 1px solid var(--border); padding: 8px 0 12px; z-index: 100; box-shadow: 0 -4px 20px rgba(0,0,0,0.04); }
+.bottom-nav button { background: none; border: none; display: flex; flex-direction: column; align-items: center; font-size: 10px; font-weight: 600; color: var(--text-soft); cursor: pointer; position: relative; flex: 1; padding: 4px; gap: 3px; }
+.bottom-nav button svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; transition: all 0.2s; }
+.bottom-nav button.active { color: var(--brand); }
+.bottom-nav button.active svg { stroke-width: 2.5; }
+.bottom-nav button.active::before { content: ''; position: absolute; top: -1px; left: 50%; transform: translateX(-50%); width: 32px; height: 32px; background: var(--brand-light); border-radius: 12px; z-index: -1; }
+.badge { position: absolute; top: 0px; right: 22%; background: var(--danger); color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: 800; border: 2px solid var(--card); }
 .hidden { display: none !important; }
-.btn { border: none; border-radius: 10px; padding: 12px 18px; font-size: 14px; font-weight: 600; cursor: pointer; }
-.btn-primary { background: var(--primary); color: #fff; }
-.btn-success { background: var(--success); color: #fff; }
-.btn-danger { background: var(--danger); color: #fff; }
-.btn-warning { background: var(--accent); color: #fff; }
-.btn-outline { background: #f1f5f9; color: var(--text); border: 1px solid var(--border); }
+.btn { border: none; border-radius: 12px; padding: 12px 18px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+.btn:active { transform: scale(0.96); }
+.btn-primary { background: linear-gradient(135deg, #059669, #047857); color: #fff; box-shadow: 0 4px 12px rgba(5,150,105,0.25); }
+.btn-success { background: linear-gradient(135deg, #10B981, #059669); color: #fff; box-shadow: 0 4px 12px rgba(16,185,129,0.25); }
+.btn-danger { background: linear-gradient(135deg, #EF4444, #DC2626); color: #fff; box-shadow: 0 4px 12px rgba(239,68,68,0.25); }
+.btn-warning { background: linear-gradient(135deg, #F59E0B, #D97706); color: #fff; box-shadow: 0 4px 12px rgba(245,158,11,0.25); }
+.btn-outline { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
 .btn-block { width: 100%; }
-.btn-sm { padding: 8px 14px; font-size: 12px; border-radius: 8px; }
+.btn-sm { padding: 8px 14px; font-size: 11px; border-radius: 10px; }
+
 .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-.stat-box { background: #fff; padding: 16px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.02); }
-.stat-box .num { font-size: 22px; font-weight: 700; color: var(--primary); }
-.stat-box .lbl { font-size: 11px; color: var(--text-light); text-transform: uppercase; margin-top: 4px; font-weight: 500; }
-.stat-box.accent { background: linear-gradient(135deg, #0f172a, #1e293b); color: #fff; grid-column: span 2; }
+.stat-box { background: var(--card); padding: 16px; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm); border: 1px solid rgba(226,232,240,0.5); }
+.stat-box .num { font-size: 22px; font-weight: 800; color: var(--text); font-feature-settings: 'tnum'; letter-spacing: -0.5px; }
+.stat-box .lbl { font-size: 10px; color: var(--text-light); text-transform: uppercase; margin-top: 4px; font-weight: 700; letter-spacing: 0.5px; }
+.stat-box.accent { background: linear-gradient(135deg, #059669, #047857); color: #fff; grid-column: span 2; box-shadow: 0 6px 20px rgba(5,150,105,0.25); }
 .stat-box.accent .num { color: #fff; font-size: 28px; }
-.stat-box.accent .lbl { color: #94a3b8; }
+.stat-box.accent .lbl { color: rgba(255,255,255,0.75); }
+
 .order-card { border-left: 4px solid var(--accent); }
-.order-card.new { border-left-color: var(--danger); animation: pulseBorder 1.5s infinite; }
-@keyframes pulseBorder { 0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.3); } 70% { box-shadow: 0 0 0 12px rgba(239,68,68,0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); } }
-.order-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; }
-.order-row span:first-child { color: var(--text-light); }
-.order-row span:last-child { font-weight: 600; color: var(--text); }
-.status-chip { font-size: 11px; padding: 4px 10px; border-radius: 20px; background: #dcfce7; color: #166534; font-weight: 600; }
-.status-chip.pending { background: #fee2e2; color: #991b1b; }
-.status-chip.accepted { background: #dbeafe; color: #1e40af; }
-.status-chip.ready { background: #fef3c7; color: #92400e; }
-.status-chip.delivered { background: #dcfce7; color: #166534; }
-.status-chip.cancelled { background: #f3f4f6; color: #6b7280; }
-.status-chip.assigned { background: #dbeafe; color: #1e40af; }
+.order-card.new { border-left-color: var(--danger); animation: pulseBorder 2s infinite; }
+@keyframes pulseBorder { 0% { box-shadow: var(--shadow-md); } 50% { box-shadow: 0 4px 24px rgba(239,68,68,0.25); } 100% { box-shadow: var(--shadow-md); } }
+.order-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 12px; gap: 10px; }
+.order-row span:first-child { color: var(--text-light); font-weight: 500; }
+.order-row span:last-child { font-weight: 700; color: var(--text); text-align: right; }
+
+.status-chip { font-size: 10px; padding: 5px 12px; border-radius: 20px; background: var(--brand-light); color: var(--brand-dark); font-weight: 800; letter-spacing: 0.3px; text-transform: uppercase; }
+.status-chip.pending { background: #FEE2E2; color: #991B1B; }
+.status-chip.accepted { background: #DBEAFE; color: #1E40AF; }
+.status-chip.ready { background: #FEF3C7; color: #92400E; }
+.status-chip.delivered { background: #D1FAE5; color: #166534; }
+.status-chip.cancelled { background: #F1F5F9; color: #64748B; }
+.status-chip.assigned { background: #DBEAFE; color: #1E40AF; }
+
 .product-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
 .product-item:last-child { border-bottom: none; }
-.product-item .prod-info h4 { font-size: 14px; color: var(--text); }
-.product-item .prod-info p { font-size: 12px; color: var(--text-light); margin-top: 2px; }
-.product-item .prod-price { font-weight: 700; color: var(--primary); font-size: 14px; }
+.product-item .prod-info h4 { font-size: 14px; color: var(--text); font-weight: 700; }
+.product-item .prod-info p { font-size: 12px; color: var(--text-light); margin-top: 2px; font-weight: 500; }
+.product-item .prod-price { font-weight: 800; color: var(--brand); font-size: 14px; font-feature-settings: 'tnum'; }
 .prod-actions { display: flex; gap: 6px; }
-.form-input { width: 100%; padding: 14px; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; font-size: 14px; outline: none; font-family: inherit; background: #fff; }
-.form-label { font-size: 12px; color: var(--text-light); margin-bottom: 6px; display: block; font-weight: 500; }
-.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: flex-end; justify-content: center; }
-.sheet { background: #fff; width: 100%; max-width: 480px; border-radius: 24px 24px 0 0; padding: 24px; max-height: 92vh; overflow-y: auto; }
-.sheet h3 { margin-bottom: 16px; font-size: 20px; }
-.toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #fff; padding: 12px 24px; border-radius: 30px; font-size: 13px; z-index: 9999; opacity: 0; transition: opacity 0.3s, transform 0.3s; pointer-events: none; max-width: 90%; text-align: center; }
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(-10px); }
-.empty { text-align: center; color: var(--text-light); padding: 60px 0; font-size: 14px; }
-.empty .big { font-size: 56px; display: block; margin-bottom: 16px; }
+
+.form-input { width: 100%; padding: 14px; border: 1px solid var(--border); border-radius: 14px; margin-bottom: 12px; font-size: 14px; outline: none; font-family: inherit; background: var(--input-bg); color: var(--text); font-weight: 500; transition: all 0.2s; }
+.form-input:focus { border-color: var(--brand); box-shadow: 0 0 0 4px rgba(5,150,105,0.1); }
+.form-label { font-size: 12px; color: var(--text-light); margin-bottom: 6px; display: block; font-weight: 600; }
+
+.overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.5); z-index: 1000; display: flex; align-items: flex-end; justify-content: center; animation: fadeIn 0.2s; backdrop-filter: blur(4px); }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.sheet { background: var(--card); width: 100%; max-width: 480px; border-radius: 28px 28px 0 0; padding: 8px 24px 24px; max-height: 92vh; overflow-y: auto; color: var(--text); animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); position: relative; }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.sheet::before { content: ''; display: block; width: 40px; height: 4px; background: #CBD5E1; border-radius: 2px; margin: 8px auto 16px; }
+.sheet h3 { margin-bottom: 16px; font-size: 20px; font-weight: 800; letter-spacing: -0.4px; }
+
+.toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); padding: 14px 22px; border-radius: 14px; font-size: 13px; font-weight: 700; z-index: 9999; opacity: 0; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none; max-width: 90%; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); color: #fff; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast::before { content: '✓'; display: inline-flex; width: 22px; height: 22px; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; border-radius: 50%; background: rgba(255,255,255,0.25); flex-shrink: 0; }
+.toast { background: linear-gradient(135deg, #059669, #047857); }
+.toast.error { background: linear-gradient(135deg, #EF4444, #DC2626); }
+.toast.error::before { content: '!'; }
+.toast.info { background: linear-gradient(135deg, #3B82F6, #2563EB); }
+.toast.info::before { content: 'i'; font-family: serif; }
+.toast.warning { background: linear-gradient(135deg, #F59E0B, #D97706); }
+.toast.warning::before { content: '⚠'; font-size: 11px; }
+
+.empty { text-align: center; color: var(--text-light); padding: 50px 20px; font-size: 14px; font-weight: 500; animation: cardIn 0.5s ease; }
+.empty svg { width: 140px; height: 140px; margin: 0 auto 16px; display: block; opacity: 0.9; }
+.empty h3 { font-size: 17px; color: var(--text); font-weight: 800; margin-bottom: 6px; letter-spacing: -0.3px; }
+.empty p { font-size: 13px; line-height: 1.5; max-width: 260px; margin: 0 auto 18px; }
+
+.skeleton { background: linear-gradient(90deg, var(--border) 25%, rgba(226,232,240,0.4) 50%, var(--border) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.skeleton-card { background: var(--card); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; display: flex; gap: 12px; box-shadow: var(--shadow-sm); }
+.skeleton-circle { width: 56px; height: 56px; border-radius: 14px; flex-shrink: 0; }
+.skeleton-lines { flex: 1; display: flex; flex-direction: column; gap: 10px; justify-content: center; }
+.skeleton-line { height: 12px; }
+.skeleton-line.short { width: 60%; }
+
 .payout-item { padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 13px; display: flex; justify-content: space-between; }
 .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
 .toggle-row:last-child { border-bottom: none; }
-.switch { width: 50px; height: 28px; background: #cbd5e1; border-radius: 20px; position: relative; cursor: pointer; transition: background 0.3s; }
-.switch.on { background: var(--success); }
+.switch { width: 50px; height: 28px; background: #CBD5E1; border-radius: 20px; position: relative; cursor: pointer; transition: background 0.3s; }
+.switch.on { background: linear-gradient(135deg, #10B981, #059669); }
 .switch::after { content: ''; position: absolute; width: 22px; height: 22px; background: #fff; border-radius: 50%; top: 3px; left: 3px; transition: left 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 .switch.on::after { left: 25px; }
-.error-msg { background: #fee2e2; color: #991b1b; padding: 10px 14px; border-radius: 10px; font-size: 13px; margin-bottom: 12px; text-align: center; font-weight: 500; }
-.info-msg { background: #dbeafe; color: #1e40af; padding: 10px 14px; border-radius: 10px; font-size: 12px; margin-bottom: 12px; text-align: center; }
-.success-msg { background: #dcfce7; color: #166534; padding: 10px 14px; border-radius: 10px; font-size: 13px; margin-bottom: 12px; text-align: center; font-weight: 500; }
-.link-btn { background: none; border: none; color: var(--accent); font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: underline; padding: 4px; }
-#pickupMap { width: 100%; height: 240px; border-radius: 12px; margin-bottom: 12px; border: 1px solid var(--border); background: var(--bg); }
+
+.error-msg { background: #FEE2E2; color: #991B1B; padding: 12px 14px; border-radius: 12px; font-size: 13px; margin-bottom: 12px; text-align: center; font-weight: 600; }
+.info-msg { background: #DBEAFE; color: #1E40AF; padding: 12px 14px; border-radius: 12px; font-size: 12px; margin-bottom: 12px; text-align: center; font-weight: 600; }
+.success-msg { background: #D1FAE5; color: #166534; padding: 12px 14px; border-radius: 12px; font-size: 13px; margin-bottom: 12px; text-align: center; font-weight: 600; }
+.link-btn { background: none; border: none; color: var(--brand); font-size: 13px; font-weight: 700; cursor: pointer; text-decoration: underline; padding: 4px; }
+#pickupMap, #editPickupMap { width: 100%; height: 240px; border-radius: 14px; margin-bottom: 12px; border: 1px solid var(--border); background: var(--bg); }
+
+@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
 </style>
 </head>
 <body>
 <div id="splash"><h1>SwatGo</h1><p>Merchant Partner</p><div class="loader"></div></div>
 <div class="app">
-  <header class="topbar"><div><div style="font-size:11px;opacity:0.7;">Merchant Panel</div><h1 id="storeNameTop">SwatGo Merchant</h1></div><div class="status" id="openToggle" onclick="toggleOpen()">Closed</div></header>
+  <header class="topbar">
+    <div class="topbar-top">
+      <div>
+        <div class="store-name-top">Merchant Panel</div>
+        <h1 id="storeNameTop">SwatGo Merchant</h1>
+      </div>
+      <div class="open-toggle" id="openToggle" onclick="toggleOpen()">Closed</div>
+    </div>
+  </header>
   <main id="app"></main>
   <nav class="bottom-nav">
-    <button data-tab="home" class="active">🏠<span class="lbl">Home</span></button>
-    <button data-tab="orders">📦<span class="lbl">Orders</span><span id="orderBadge" class="badge hidden">0</span></button>
-    <button data-tab="products">🍔<span class="lbl">Products</span></button>
-    <button data-tab="earnings">💰<span class="lbl">Earnings</span></button>
-    <button data-tab="profile">⚙️<span class="lbl">Profile</span></button>
+    <button data-tab="home" class="active"><svg viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</button>
+    <button data-tab="orders"><svg viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>Orders<span id="orderBadge" class="badge hidden">0</span></button>
+    <button data-tab="products"><svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>Products</button>
+    <button data-tab="earnings"><svg viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Earnings</button>
+    <button data-tab="profile"><svg viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>Profile</button>
   </nav>
 </div>
 <div id="toast" class="toast"></div>
@@ -127,69 +213,24 @@ p { font-size: 13px; color: var(--text-light); }
   let loginFlow = { step: 0, phone: "", email: "", merchantData: null, mode: "login" };
   let signupLocation = { lat: null, lng: null, address: "" };
   let signupMap = null, signupMarker = null;
+  let editMap = null, editMarker = null;
+  let editLocation = { lat: null, lng: null };
 
-  function toast(msg) { const t = document.getElementById("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(window._t); window._t = setTimeout(() => t.classList.remove("show"), 3000); }
-  function closeModal() { document.getElementById("modalRoot").innerHTML = ""; loginFlow = { step: 0, phone: "", email: "", merchantData: null, mode: "login" }; signupLocation = { lat: null, lng: null, address: "" }; signupMap = null; signupMarker = null; }
+  function toast(msg, type) { const t = document.getElementById("toast"); t.textContent = msg; t.className = "toast " + (type || ""); t.classList.add("show"); clearTimeout(window._t); window._t = setTimeout(() => t.classList.remove("show"), 2400); }
+  function closeModal() { document.getElementById("modalRoot").innerHTML = ""; loginFlow = { step: 0, phone: "", email: "", merchantData: null, mode: "login" }; signupLocation = { lat: null, lng: null, address: "" }; signupMap = null; signupMarker = null; editMap = null; editMarker = null; }
   function saveLocal() { if (state.merchant) localStorage.setItem("syedgo_merchant", JSON.stringify(state.merchant)); localStorage.setItem("syedgo_merchant_open", state.isOpen); }
 
-  // FCM
-  async function requestFcmToken() {
-    if (!window.FcmBridge) return;
-    window.onFcmTokenReceived = async function(token) {
-      if (!token) return;
-      localStorage.setItem('swatgo_fcm_token', token);
-      await saveFcmTokenToFirestore(token);
-    };
-    window.FcmBridge.postMessage('getFcmToken');
-  }
+  async function requestFcmToken() { if (!window.FcmBridge) return; window.onFcmTokenReceived = async function(token) { if (!token) return; localStorage.setItem('swatgo_fcm_token', token); await saveFcmTokenToFirestore(token); }; window.FcmBridge.postMessage('getFcmToken'); }
+  async function saveFcmTokenToFirestore(token) { if (!state.merchant) return; try { const phoneKey = state.merchant.phone.replace(/[^0-9]/g, ''); await setDoc(doc(db, 'device_tokens', 'merchant_' + phoneKey), { token, userType: 'merchant', userId: state.merchant.phone, userName: state.merchant.storeName, storeName: state.merchant.storeName, updatedAt: new Date().toISOString(), platform: 'android' }, { merge: true }); } catch (e) { console.error(e); } }
+  async function removeFcmToken() { if (!state.merchant) return; try { const phoneKey = state.merchant.phone.replace(/[^0-9]/g, ''); await deleteDoc(doc(db, 'device_tokens', 'merchant_' + phoneKey)); } catch (e) { console.error(e); } }
 
-  async function saveFcmTokenToFirestore(token) {
-    if (!state.merchant) return;
-    try {
-      const phoneKey = state.merchant.phone.replace(/[^0-9]/g, '');
-      await setDoc(doc(db, 'device_tokens', 'merchant_' + phoneKey), {
-        token: token, userType: 'merchant', userId: state.merchant.phone, userName: state.merchant.storeName, storeName: state.merchant.storeName,
-        updatedAt: new Date().toISOString(), platform: 'android'
-      }, { merge: true });
-    } catch (e) { console.error('FCM: Save failed:', e); }
-  }
+  async function hashPassword(password) { const encoder = new TextEncoder(); const data = encoder.encode(password + "syedgo_merchant_salt_v1"); const hashBuffer = await crypto.subtle.digest('SHA-256', data); const hashArray = Array.from(new Uint8Array(hashBuffer)); return hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); }
+  function normalizePhone(input) { let phone = String(input || "").replace(/[\s\-()]/g, ""); if (phone.startsWith("0")) phone = "+92" + phone.slice(1); else if (phone.startsWith("92") && !phone.startsWith("+")) phone = "+" + phone; else if (!phone.startsWith("+")) phone = "+92" + phone; return phone; }
 
-  async function removeFcmToken() {
-    if (!state.merchant) return;
-    try {
-      const phoneKey = state.merchant.phone.replace(/[^0-9]/g, '');
-      await deleteDoc(doc(db, 'device_tokens', 'merchant_' + phoneKey));
-    } catch (e) { console.error('FCM: Remove failed:', e); }
-  }
+  function updateOpenStatus() { const el = document.getElementById("openToggle"); el.textContent = state.isOpen ? "🟢 OPEN" : "🔴 CLOSED"; el.classList.toggle("open", state.isOpen); }
+  function toggleOpen() { if (!state.merchant) return toast("Login first", "warning"); state.isOpen = !state.isOpen; saveLocal(); updateOpenStatus(); toast(state.isOpen ? "Store is Open" : "Store is Closed", state.isOpen ? "success" : "info"); }
 
-  async function hashPassword(password) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password + "syedgo_merchant_salt_v1");
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  }
-
-  function normalizePhone(input) {
-    let phone = String(input || "").replace(/[\s\-()]/g, "");
-    if (phone.startsWith("0")) phone = "+92" + phone.slice(1);
-    else if (phone.startsWith("92") && !phone.startsWith("+")) phone = "+" + phone;
-    else if (!phone.startsWith("+")) phone = "+92" + phone;
-    return phone;
-  }
-
-  function updateOpenStatus() { const el = document.getElementById("openToggle"); el.textContent = state.isOpen ? "🟢 Open" : "🔴 Closed"; el.classList.toggle("open", state.isOpen); }
-  function toggleOpen() { if (!state.merchant) return toast("Login first"); state.isOpen = !state.isOpen; saveLocal(); updateOpenStatus(); toast(state.isOpen ? "Open" : "Closed"); }
-
-  function loadSettings() {
-    if (state.settingsListener) state.settingsListener();
-    state.settingsListener = onSnapshot(doc(db, "settings", "global"), (snap) => {
-      if (snap.exists()) {
-        state.commissionRate = snap.data().commissionRate || 10;
-        if (state.tab === "earnings" || state.tab === "home") render();
-      }
-    });
-  }
+  function loadSettings() { if (state.settingsListener) state.settingsListener(); state.settingsListener = onSnapshot(doc(db, "settings", "global"), (snap) => { if (snap.exists()) { state.commissionRate = snap.data().commissionRate || 10; if (state.tab === "earnings" || state.tab === "home") render(); } }); }
 
   function loadOrders() {
     if (!state.merchant) return;
@@ -202,9 +243,9 @@ p { font-size: 13px; color: var(--text-light); }
       myOrders.forEach(newOrd => {
         const oldOrd = prevOrders.find(o => o.id === newOrd.id);
         if (oldOrd) {
-          if (oldOrd.status === "Ready for Pickup" && newOrd.status === "Rider Assigned" && newOrd.rider) toast(`🛵 ${newOrd.rider.name} accepted order #${newOrd.id}!`);
-          else if (oldOrd.status !== "Delivered" && newOrd.status === "Delivered") toast(`✅ Order #${newOrd.id} delivered!`);
-        } else if (newOrd.status === "Placed") toast(`🔔 New order #${newOrd.id}!`);
+          if (oldOrd.status === "Ready for Pickup" && newOrd.status === "Rider Assigned" && newOrd.rider) toast(`🛵 ${newOrd.rider.name} accepted order #${newOrd.id}`, "info");
+          else if (oldOrd.status !== "Delivered" && newOrd.status === "Delivered") toast(`Order #${newOrd.id} delivered`, "success");
+        } else if (newOrd.status === "Placed") toast(`🔔 New order #${newOrd.id}!`, "warning");
       });
       state.orders = myOrders;
       updateOrderBadge();
@@ -212,59 +253,47 @@ p { font-size: 13px; color: var(--text-light); }
     });
   }
 
-  function loadPayouts() {
-    if (!state.merchant) return;
-    if (state.payoutsListener) state.payoutsListener();
-    state.payoutsListener = onSnapshot(query(collection(db, "payouts"), where("merchantPhone", "==", state.merchant.phone)), (snap) => {
-      const arr = [];
-      snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
-      arr.sort((a, b) => new Date(b.requestedAt) - new Date(a.requestedAt));
-      state.payouts = arr;
-      if (state.tab === "earnings") render();
-    });
-  }
+  function loadPayouts() { if (!state.merchant) return; if (state.payoutsListener) state.payoutsListener(); state.payoutsListener = onSnapshot(query(collection(db, "payouts"), where("merchantPhone", "==", state.merchant.phone)), (snap) => { const arr = []; snap.forEach(d => arr.push({ id: d.id, ...d.data() })); arr.sort((a, b) => new Date(b.requestedAt) - new Date(a.requestedAt)); state.payouts = arr; if (state.tab === "earnings") render(); }); }
 
   function updateOrderBadge() { const pending = state.orders.filter(o => o.status === "Placed").length; const badge = document.getElementById("orderBadge"); if (pending > 0) { badge.textContent = pending; badge.classList.remove("hidden"); } else badge.classList.add("hidden"); }
 
-  async function acceptOrder(orderId) { try { await updateDoc(doc(db, "orders", orderId), { status: "Accepted by Store", acceptedAt: new Date().toISOString() }); toast("Accepted ✅"); } catch (e) { toast("Failed"); } }
-  async function rejectOrder(orderId) { if (!confirm("Reject this order?")) return; try { await updateDoc(doc(db, "orders", orderId), { status: "Rejected", rejectedAt: new Date().toISOString(), rejectedBy: "Merchant" }); toast("Rejected ❌"); } catch (e) { toast("Failed"); } }
-  async function markReady(orderId) { try { await updateDoc(doc(db, "orders", orderId), { status: "Ready for Pickup", readyAt: new Date().toISOString() }); toast("Ready! Riders notified 🛵"); } catch (e) { toast("Failed"); } }
+  async function acceptOrder(orderId) { try { await updateDoc(doc(db, "orders", orderId), { status: "Accepted by Store", acceptedAt: new Date().toISOString() }); toast("Order accepted", "success"); } catch (e) { toast("Failed", "error"); } }
+  async function rejectOrder(orderId) { if (!confirm("Reject this order?")) return; try { await updateDoc(doc(db, "orders", orderId), { status: "Rejected", rejectedAt: new Date().toISOString(), rejectedBy: "Merchant" }); toast("Order rejected", "info"); } catch (e) { toast("Failed", "error"); } }
+  async function markReady(orderId) { try { await updateDoc(doc(db, "orders", orderId), { status: "Ready for Pickup", readyAt: new Date().toISOString() }); toast("Ready! Riders notified", "success"); } catch (e) { toast("Failed", "error"); } }
 
   async function saveProducts() { if (!state.merchant) return; try { await setDoc(doc(db, "merchants", state.merchant.phone), { merchant: state.merchant, products: state.products, updatedAt: new Date().toISOString() }, { merge: true }); } catch (e) { console.error(e); } }
 
   function addProductModal(editId = null) {
     const p = editId ? state.products.find(x => String(x.id) === String(editId)) : null;
-    document.getElementById("modalRoot").innerHTML = `<div class="overlay" onclick="if(event.target===this)closeModal()"><div class="sheet"><h3>${p ? 'Edit' : 'Add'} Product</h3><label class="form-label">Name</label><input class="form-input" id="pName" placeholder="Zinger Burger" value="${p ? p.name : ''}" /><label class="form-label">Description</label><input class="form-input" id="pDesc" placeholder="Crispy chicken burger" value="${p ? p.desc : ''}" /><label class="form-label">Price (PKR)</label><input class="form-input" id="pPrice" type="number" placeholder="550" value="${p ? p.price : ''}" /><label class="form-label">Category</label><input class="form-input" id="pCat" placeholder="Burgers" value="${p ? p.category || '' : ''}" /><div class="toggle-row"><span>In Stock</span><div class="switch ${!p || p.stock !== false ? 'on' : ''}" onclick="this.classList.toggle('on')" id="pStockSwitch"></div></div><button class="btn btn-primary btn-block" style="margin-top:16px;" onclick="saveProduct('${editId || ''}')">${p ? 'Update' : 'Add'}</button><button class="btn btn-outline btn-block" style="margin-top:8px;" onclick="closeModal()">Cancel</button></div></div>`;
+    document.getElementById("modalRoot").innerHTML = `<div class="overlay" onclick="if(event.target===this)closeModal()"><div class="sheet"><h3>${p ? 'Edit' : 'Add'} Product</h3><label class="form-label">Name</label><input class="form-input" id="pName" placeholder="Zinger Burger" value="${p ? p.name : ''}" /><label class="form-label">Description</label><input class="form-input" id="pDesc" placeholder="Crispy chicken burger" value="${p ? p.desc : ''}" /><label class="form-label">Price (PKR)</label><input class="form-input" id="pPrice" type="number" placeholder="550" value="${p ? p.price : ''}" /><label class="form-label">Category</label><input class="form-input" id="pCat" placeholder="Burgers" value="${p ? p.category || '' : ''}" /><div class="toggle-row"><span>In Stock</span><div class="switch ${!p || p.stock !== false ? 'on' : ''}" onclick="this.classList.toggle('on')" id="pStockSwitch"></div></div><button class="btn btn-primary btn-block" style="margin-top:16px;" onclick="saveProduct('${editId || ''}')">${p ? 'Update' : 'Add Product'}</button><button class="btn btn-outline btn-block" style="margin-top:8px;" onclick="closeModal()">Cancel</button></div></div>`;
   }
 
   async function saveProduct(editId) {
     const name = document.getElementById('pName').value.trim(); const desc = document.getElementById('pDesc').value.trim(); const price = parseInt(document.getElementById('pPrice').value); const category = document.getElementById('pCat').value.trim() || "General"; const stock = document.getElementById('pStockSwitch').classList.contains('on');
-    if (!name || !price) return toast("Name and price required");
+    if (!name || !price) return toast("Name and price required", "warning");
     if (editId) { const idx = state.products.findIndex(x => String(x.id) === String(editId)); if (idx >= 0) state.products[idx] = { ...state.products[idx], name, desc, price, category, stock }; }
     else { state.products.push({ id: Date.now(), name, desc, price, category, stock }); }
-    await saveProducts(); closeModal(); render(); toast(editId ? "Updated ✅" : "Added ✅");
+    await saveProducts(); closeModal(); render(); toast(editId ? "Product updated" : "Product added", "success");
   }
 
-  async function deleteProduct(id) { if (!confirm("Delete this product?")) return; state.products = state.products.filter(x => String(x.id) !== String(id)); await saveProducts(); render(); toast("Deleted"); }
+  async function deleteProduct(id) { if (!confirm("Delete this product?")) return; state.products = state.products.filter(x => String(x.id) !== String(id)); await saveProducts(); render(); toast("Product deleted", "info"); }
 
   function openAuth() { loginFlow = { step: 1, phone: "", email: "", merchantData: null, mode: "login" }; renderAuthModal(); }
 
   function renderAuthModal() {
     const modalRoot = document.getElementById("modalRoot");
-
     if (loginFlow.mode === "login") {
       if (loginFlow.step === 1) {
-        modalRoot.innerHTML = `<div class="overlay"><div class="sheet"><h3>🏪 Merchant Login</h3><p style="font-size:13px;color:var(--text-light);margin-bottom:14px;">Enter your registered phone number.</p><label class="form-label">Phone Number</label><input class="form-input" id="authPhone" placeholder="+92 300 1234567" type="tel" onkeypress="if(event.key==='Enter')submitPhone()" /><button class="btn btn-primary btn-block" onclick="submitPhone()">Continue</button><button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="closeModal()">Cancel</button><p style="font-size:11px;color:var(--text-light);margin-top:12px;text-align:center;">New merchant? Enter your phone and click Continue to sign up.</p></div></div>`;
+        modalRoot.innerHTML = `<div class="overlay"><div class="sheet"><h3>🏪 Merchant Login</h3><p style="font-size:13px;color:var(--text-light);margin-bottom:14px;font-weight:500;">Enter your registered phone number.</p><label class="form-label">Phone Number</label><input class="form-input" id="authPhone" placeholder="+92 300 1234567" type="tel" onkeypress="if(event.key==='Enter')submitPhone()" /><button class="btn btn-primary btn-block" onclick="submitPhone()">Continue</button><button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="closeModal()">Cancel</button><p style="font-size:11px;color:var(--text-light);margin-top:12px;text-align:center;font-weight:500;">New merchant? Enter your phone to sign up.</p></div></div>`;
         setTimeout(() => document.getElementById('authPhone')?.focus(), 100);
       } else if (loginFlow.step === 2) {
-        modalRoot.innerHTML = `<div class="overlay"><div class="sheet"><h3>🏪 Merchant Login</h3><div class="info-msg">📱 ${loginFlow.phone}</div><p style="font-size:13px;color:var(--text-light);margin-bottom:14px;">Enter the email address linked to this account.</p><label class="form-label">Email Address</label><input class="form-input" id="authEmail" placeholder="you@example.com" type="email" onkeypress="if(event.key==='Enter')submitEmail()" /><div id="emailError"></div><button class="btn btn-primary btn-block" onclick="submitEmail()">Continue</button><button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="backToPhone()">← Back</button></div></div>`;
+        modalRoot.innerHTML = `<div class="overlay"><div class="sheet"><h3>🏪 Merchant Login</h3><div class="info-msg">📱 ${loginFlow.phone}</div><p style="font-size:13px;color:var(--text-light);margin-bottom:14px;font-weight:500;">Enter the email linked to this account.</p><label class="form-label">Email Address</label><input class="form-input" id="authEmail" placeholder="you@example.com" type="email" onkeypress="if(event.key==='Enter')submitEmail()" /><div id="emailError"></div><button class="btn btn-primary btn-block" onclick="submitEmail()">Continue</button><button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="backToPhone()">← Back</button></div></div>`;
         setTimeout(() => document.getElementById('authEmail')?.focus(), 100);
       } else if (loginFlow.step === 3) {
-        modalRoot.innerHTML = `<div class="overlay"><div class="sheet"><h3>🏪 Merchant Login</h3><div class="info-msg">📱 ${loginFlow.phone} • ✉️ ${loginFlow.email}</div><p style="font-size:13px;color:var(--text-light);margin-bottom:14px;">Enter your password to continue.</p><label class="form-label">Password</label><input class="form-input" id="authPassword" type="password" placeholder="Your password" onkeypress="if(event.key==='Enter')submitLoginPassword()" /><div id="passError"></div><button class="btn btn-primary btn-block" onclick="submitLoginPassword()">Login</button><button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="backToEmail()">← Back</button><div style="text-align:center;margin-top:12px;"><button class="link-btn" onclick="startPasswordReset()">Forgot Password?</button></div></div></div>`;
+        modalRoot.innerHTML = `<div class="overlay"><div class="sheet"><h3>🏪 Merchant Login</h3><div class="info-msg">📱 ${loginFlow.phone} • ✉️ ${loginFlow.email}</div><p style="font-size:13px;color:var(--text-light);margin-bottom:14px;font-weight:500;">Enter your password.</p><label class="form-label">Password</label><input class="form-input" id="authPassword" type="password" placeholder="Your password" onkeypress="if(event.key==='Enter')submitLoginPassword()" /><div id="passError"></div><button class="btn btn-primary btn-block" onclick="submitLoginPassword()">Login</button><button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="backToEmail()">← Back</button><div style="text-align:center;margin-top:14px;"><button class="link-btn" onclick="startPasswordReset()">Forgot Password?</button></div></div></div>`;
         setTimeout(() => document.getElementById('authPassword')?.focus(), 100);
       }
     } else if (loginFlow.mode === "signup") {
-      // NEW SIGNUP with location picker
       modalRoot.innerHTML = `<div class="overlay"><div class="sheet"><h3>🏪 Register Your Business</h3><div class="info-msg">📱 ${loginFlow.phone}</div>
         <label class="form-label">Store Name *</label><input class="form-input" id="sStoreName" placeholder="e.g. Al-Madina Superstore" />
         <label class="form-label">Owner Name *</label><input class="form-input" id="sOwnerName" placeholder="e.g. Ali Khan" />
@@ -272,16 +301,14 @@ p { font-size: 13px; color: var(--text-light); }
         <label class="form-label">Password *</label><input class="form-input" id="sPassword" placeholder="Min 6 characters" type="password" />
         <label class="form-label">Confirm Password *</label><input class="form-input" id="sConfirm" placeholder="Repeat password" type="password" />
         <label class="form-label">Category *</label><select class="form-input" id="sCategory">${CATEGORIES.map(c => `<option value="${c.key}">${c.emoji} ${c.label}</option>`).join("")}</select>
-        
-        <label class="form-label" style="font-weight:700;color:var(--accent);">📍 Store Location (Pickup Point) *</label>
-        <p style="font-size:11px;color:var(--text-light);margin-bottom:8px;">Riders will navigate to this exact location</p>
+        <label class="form-label" style="font-weight:800;color:var(--brand);">📍 Store Location (Pickup Point) *</label>
+        <p style="font-size:11px;color:var(--text-light);margin-bottom:8px;font-weight:500;">Riders will navigate to this exact location</p>
         <button type="button" class="btn btn-success btn-block" onclick="signupGoToMyLocation()" style="margin-bottom:10px;">📍 Use My Current Location</button>
         <div id="pickupMap"></div>
-        <p style="font-size:11px;text-align:center;color:var(--text-light);margin-bottom:12px;">🔴 Drag pin or tap map to adjust exact pickup location</p>
+        <p style="font-size:11px;text-align:center;color:var(--text-light);margin-bottom:12px;font-weight:500;">🔴 Drag pin or tap map to set pickup location</p>
         <label class="form-label">Store Address *</label>
         <textarea class="form-input" id="sAddress" placeholder="e.g. Mingora Bazaar, Swat" rows="2" style="resize:none;"></textarea>
-        <div id="signupLocationStatus" style="font-size:11px;color:var(--text-light);margin-top:-8px;margin-bottom:12px;"></div>
-        
+        <div id="signupLocationStatus" style="font-size:11px;color:var(--text-light);margin-top:-8px;margin-bottom:12px;font-weight:600;"></div>
         <label class="form-label">Opening Hours</label><input class="form-input" id="sHours" value="8:00 AM - 11:00 PM" />
         <label class="form-label">Delivery Area (optional)</label><input class="form-input" id="sArea" placeholder="e.g. Mingora, Saidu Sharif" />
         <div id="signupError"></div>
@@ -291,45 +318,32 @@ p { font-size: 13px; color: var(--text-light); }
       setTimeout(() => initSignupMap(), 200);
     } else if (loginFlow.mode === "reset") {
       if (loginFlow.step === 1) {
-        modalRoot.innerHTML = `<div class="overlay"><div class="sheet"><h3>🔐 Reset Password</h3><p style="font-size:13px;color:var(--text-light);margin-bottom:14px;">Enter your registered phone number.</p><label class="form-label">Phone Number</label><input class="form-input" id="resetPhone" placeholder="+92 300 1234567" type="tel" onkeypress="if(event.key==='Enter')resetSubmitPhone()" /><div id="resetError"></div><button class="btn btn-primary btn-block" onclick="resetSubmitPhone()">Continue</button><button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="openAuth()">← Back to Login</button></div></div>`;
+        modalRoot.innerHTML = `<div class="overlay"><div class="sheet"><h3>🔐 Reset Password</h3><p style="font-size:13px;color:var(--text-light);margin-bottom:14px;font-weight:500;">Enter your registered phone number.</p><label class="form-label">Phone Number</label><input class="form-input" id="resetPhone" placeholder="+92 300 1234567" type="tel" onkeypress="if(event.key==='Enter')resetSubmitPhone()" /><div id="resetError"></div><button class="btn btn-primary btn-block" onclick="resetSubmitPhone()">Continue</button><button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="openAuth()">← Back to Login</button></div></div>`;
         setTimeout(() => document.getElementById('resetPhone')?.focus(), 100);
       } else if (loginFlow.step === 2) {
-        modalRoot.innerHTML = `<div class="overlay"><div class="sheet"><h3>🔐 Reset Password</h3><div class="info-msg">📱 ${loginFlow.phone}</div><p style="font-size:13px;color:var(--text-light);margin-bottom:14px;">Enter the email linked to this account.</p><label class="form-label">Email Address</label><input class="form-input" id="resetEmail" placeholder="you@example.com" type="email" onkeypress="if(event.key==='Enter')resetSubmitEmail()" /><div id="resetError"></div><button class="btn btn-primary btn-block" onclick="resetSubmitEmail()">Continue</button><button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="openAuth()">← Back to Login</button></div></div>`;
+        modalRoot.innerHTML = `<div class="overlay"><div class="sheet"><h3>🔐 Reset Password</h3><div class="info-msg">📱 ${loginFlow.phone}</div><p style="font-size:13px;color:var(--text-light);margin-bottom:14px;font-weight:500;">Enter the email linked to this account.</p><label class="form-label">Email</label><input class="form-input" id="resetEmail" placeholder="you@example.com" type="email" onkeypress="if(event.key==='Enter')resetSubmitEmail()" /><div id="resetError"></div><button class="btn btn-primary btn-block" onclick="resetSubmitEmail()">Continue</button><button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="openAuth()">← Back</button></div></div>`;
         setTimeout(() => document.getElementById('resetEmail')?.focus(), 100);
       } else if (loginFlow.step === 3) {
-        modalRoot.innerHTML = `<div class="overlay"><div class="sheet"><h3>🔐 Security Questions</h3><p style="font-size:13px;color:var(--text-light);margin-bottom:14px;">Answer <b>at least one</b> question correctly.</p><label class="form-label">Q1: What is the name of the Restaurant/Shop?</label><input class="form-input" id="resetQ1" placeholder="Your answer" /><label class="form-label">Q2: What is the name of the Owner?</label><input class="form-input" id="resetQ2" placeholder="Your answer" /><div id="resetError"></div><button class="btn btn-primary btn-block" onclick="resetSubmitQuestions()">Verify</button><button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="openAuth()">← Back to Login</button></div></div>`;
+        modalRoot.innerHTML = `<div class="overlay"><div class="sheet"><h3>🔐 Security Questions</h3><p style="font-size:13px;color:var(--text-light);margin-bottom:14px;font-weight:500;">Answer at least one question correctly.</p><label class="form-label">Q1: Name of the Shop?</label><input class="form-input" id="resetQ1" placeholder="Your answer" /><label class="form-label">Q2: Name of the Owner?</label><input class="form-input" id="resetQ2" placeholder="Your answer" /><div id="resetError"></div><button class="btn btn-primary btn-block" onclick="resetSubmitQuestions()">Verify</button><button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="openAuth()">← Back</button></div></div>`;
       } else if (loginFlow.step === 4) {
-        modalRoot.innerHTML = `<div class="overlay"><div class="sheet"><h3>🔐 Set New Password</h3><div class="success-msg">✅ Identity verified</div><label class="form-label">New Password</label><input class="form-input" id="resetNewPass" type="password" placeholder="Min 6 characters" /><label class="form-label">Confirm New Password</label><input class="form-input" id="resetNewConfirm" type="password" placeholder="Repeat new password" /><div id="resetError"></div><button class="btn btn-success btn-block" onclick="resetSaveNewPassword()">Save New Password</button></div></div>`;
+        modalRoot.innerHTML = `<div class="overlay"><div class="sheet"><h3>🔐 Set New Password</h3><div class="success-msg">✅ Identity verified</div><label class="form-label">New Password</label><input class="form-input" id="resetNewPass" type="password" placeholder="Min 6 characters" /><label class="form-label">Confirm New Password</label><input class="form-input" id="resetNewConfirm" type="password" placeholder="Repeat password" /><div id="resetError"></div><button class="btn btn-success btn-block" onclick="resetSaveNewPassword()">Save New Password</button></div></div>`;
       }
     }
   }
 
-  // ============================================
-  // SIGNUP LOCATION PICKER
-  // ============================================
   function initSignupMap() {
     const el = document.getElementById("pickupMap"); if (!el) return;
     const center = signupLocation.lat && signupLocation.lng ? { lat: signupLocation.lat, lng: signupLocation.lng } : { lat: 34.7717, lng: 72.3600 };
     signupMap = new google.maps.Map(el, { center, zoom: 15, disableDefaultUI: true, zoomControl: true });
     signupMarker = new google.maps.Marker({ position: center, map: signupMap, draggable: true, icon: { url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png" } });
-    google.maps.event.addListener(signupMarker, 'dragend', () => {
-      const pos = signupMarker.getPosition();
-      signupLocation.lat = pos.lat(); signupLocation.lng = pos.lng();
-      updateSignupStatus();
-      reverseGeocodeSignup(pos.lat(), pos.lng());
-    });
-    signupMap.addListener('click', (e) => {
-      signupMarker.setPosition(e.latLng);
-      signupLocation.lat = e.latLng.lat(); signupLocation.lng = e.latLng.lng();
-      updateSignupStatus();
-      reverseGeocodeSignup(e.latLng.lat(), e.latLng.lng());
-    });
+    google.maps.event.addListener(signupMarker, 'dragend', () => { const pos = signupMarker.getPosition(); signupLocation.lat = pos.lat(); signupLocation.lng = pos.lng(); updateSignupStatus(); reverseGeocodeSignup(pos.lat(), pos.lng()); });
+    signupMap.addListener('click', (e) => { signupMarker.setPosition(e.latLng); signupLocation.lat = e.latLng.lat(); signupLocation.lng = e.latLng.lng(); updateSignupStatus(); reverseGeocodeSignup(e.latLng.lat(), e.latLng.lng()); });
     updateSignupStatus();
   }
 
   function signupGoToMyLocation() {
-    if (!navigator.geolocation) return toast("GPS not supported");
-    toast("Getting your location...");
+    if (!navigator.geolocation) return toast("GPS not supported", "error");
+    toast("Getting your location...", "info");
     navigator.geolocation.getCurrentPosition((pos) => {
       const lat = pos.coords.latitude, lng = pos.coords.longitude;
       signupLocation.lat = lat; signupLocation.lng = lng;
@@ -337,78 +351,39 @@ p { font-size: 13px; color: var(--text-light); }
       if (signupMarker) signupMarker.setPosition({ lat, lng });
       updateSignupStatus();
       reverseGeocodeSignup(lat, lng);
-      toast("Location detected ✅");
-    }, (err) => { alert(err.code === 1 ? "🚫 Permission blocked. Please allow location access." : "Error: " + err.message); }, { enableHighAccuracy: true, timeout: 15000 });
+      toast("Location detected", "success");
+    }, (err) => { toast(err.code === 1 ? "Permission blocked" : "Error: " + err.message, "error"); }, { enableHighAccuracy: true, timeout: 15000 });
   }
 
   function reverseGeocodeSignup(lat, lng) {
     new google.maps.Geocoder().geocode({ location: { lat, lng } }, (results, status) => {
       const addrInput = document.getElementById('sAddress');
-      if (status === "OK" && results[0] && results[0].formatted_address && addrInput) {
-        addrInput.value = results[0].formatted_address;
-        signupLocation.address = results[0].formatted_address;
-        updateSignupStatus();
-      }
+      if (status === "OK" && results[0] && results[0].formatted_address && addrInput) { addrInput.value = results[0].formatted_address; signupLocation.address = results[0].formatted_address; updateSignupStatus(); }
     });
   }
 
   function updateSignupStatus() {
-    const statusEl = document.getElementById("signupLocationStatus");
-    if (!statusEl) return;
-    if (signupLocation.lat && signupLocation.lng) {
-      statusEl.innerHTML = `✅ Location set: ${signupLocation.lat.toFixed(5)}, ${signupLocation.lng.toFixed(5)}`;
-      statusEl.style.color = "var(--success)";
-    } else {
-      statusEl.innerHTML = `⚠️ Click "Use My Current Location" or drag pin to set pickup location`;
-      statusEl.style.color = "var(--danger)";
-    }
+    const statusEl = document.getElementById("signupLocationStatus"); if (!statusEl) return;
+    if (signupLocation.lat && signupLocation.lng) { statusEl.innerHTML = `✅ Location set: ${signupLocation.lat.toFixed(5)}, ${signupLocation.lng.toFixed(5)}`; statusEl.style.color = "var(--success)"; }
+    else { statusEl.innerHTML = `⚠️ Set your pickup location`; statusEl.style.color = "var(--danger)"; }
   }
 
   async function submitPhone() {
-    const input = document.getElementById('authPhone').value.trim();
-    if (!input) return toast("Enter phone number");
-    const phone = normalizePhone(input);
-    loginFlow.phone = phone;
-    toast("Checking...");
+    const input = document.getElementById('authPhone').value.trim(); if (!input) return toast("Enter phone number", "warning");
+    const phone = normalizePhone(input); loginFlow.phone = phone; toast("Checking...", "info");
     try {
       const snap = await getDoc(doc(db, "merchants", phone));
       if (snap.exists()) {
-        const data = snap.data();
-        const merchant = data.merchant || data;
-        if (!merchant.passwordHash) {
-          document.getElementById("modalRoot").innerHTML = `<div class="overlay"><div class="sheet"><h3>Account Upgrade Required</h3><div class="error-msg">This account was created before the new login system.<br>Please sign up again with the same phone number to set a password.</div><button class="btn btn-outline btn-block" onclick="openAuth()">← Back</button></div></div>`;
-          return;
-        }
-        loginFlow.merchantData = data;
-        loginFlow.step = 2;
-        renderAuthModal();
-      } else {
-        loginFlow.mode = "signup";
-        renderAuthModal();
-      }
-    } catch (e) { console.error(e); toast("Network error"); }
+        const data = snap.data(); const merchant = data.merchant || data;
+        if (!merchant.passwordHash) { document.getElementById("modalRoot").innerHTML = `<div class="overlay"><div class="sheet"><h3>Account Upgrade Required</h3><div class="error-msg">This account was created before the new login system.<br>Please sign up again with the same phone number to set a password.</div><button class="btn btn-outline btn-block" onclick="openAuth()">← Back</button></div></div>`; return; }
+        loginFlow.merchantData = data; loginFlow.step = 2; renderAuthModal();
+      } else { loginFlow.mode = "signup"; renderAuthModal(); }
+    } catch (e) { console.error(e); toast("Network error", "error"); }
   }
 
-  function submitEmail() {
-    const email = document.getElementById('authEmail').value.trim().toLowerCase();
-    const errBox = document.getElementById('emailError');
-    if (!email) { errBox.innerHTML = '<div class="error-msg">Please enter your email.</div>'; return; }
-    const storedEmail = (loginFlow.merchantData?.merchant?.email || "").toLowerCase();
-    if (email !== storedEmail) { errBox.innerHTML = '<div class="error-msg">❌ Data doesn\'t match.</div>'; return; }
-    loginFlow.email = email;
-    loginFlow.step = 3;
-    renderAuthModal();
-  }
+  function submitEmail() { const email = document.getElementById('authEmail').value.trim().toLowerCase(); const errBox = document.getElementById('emailError'); if (!email) { errBox.innerHTML = '<div class="error-msg">Please enter your email.</div>'; return; } const storedEmail = (loginFlow.merchantData?.merchant?.email || "").toLowerCase(); if (email !== storedEmail) { errBox.innerHTML = '<div class="error-msg">❌ Data doesn\'t match.</div>'; return; } loginFlow.email = email; loginFlow.step = 3; renderAuthModal(); }
 
-  async function submitLoginPassword() {
-    const password = document.getElementById('authPassword').value;
-    const errBox = document.getElementById('passError');
-    if (!password) { errBox.innerHTML = '<div class="error-msg">Please enter your password.</div>'; return; }
-    const storedHash = loginFlow.merchantData?.merchant?.passwordHash;
-    const enteredHash = await hashPassword(password);
-    if (enteredHash !== storedHash) { errBox.innerHTML = '<div class="error-msg">❌ Wrong password.</div>'; return; }
-    completeLogin(loginFlow.merchantData);
-  }
+  async function submitLoginPassword() { const password = document.getElementById('authPassword').value; const errBox = document.getElementById('passError'); if (!password) { errBox.innerHTML = '<div class="error-msg">Please enter your password.</div>'; return; } const storedHash = loginFlow.merchantData?.merchant?.passwordHash; const enteredHash = await hashPassword(password); if (enteredHash !== storedHash) { errBox.innerHTML = '<div class="error-msg">❌ Wrong password.</div>'; return; } completeLogin(loginFlow.merchantData); }
 
   function completeLogin(data) {
     state.merchant = data.merchant || data;
@@ -417,7 +392,7 @@ p { font-size: 13px; color: var(--text-light); }
     loadOrders(); loadPayouts(); loadSettings(); updateOpenStatus();
     document.getElementById('storeNameTop').textContent = state.merchant.storeName;
     render();
-    toast("Welcome back, " + state.merchant.storeName + "! 🎉");
+    toast("Welcome back, " + state.merchant.storeName, "success");
     requestFcmToken();
   }
 
@@ -435,90 +410,40 @@ p { font-size: 13px; color: var(--text-light); }
     const hours = document.getElementById('sHours').value.trim();
     const deliveryArea = document.getElementById('sArea').value.trim();
     const errBox = document.getElementById('signupError');
-
     if (!storeName || !ownerName) return errBox.innerHTML = '<div class="error-msg">Store name and owner name required.</div>';
-    if (!email) return errBox.innerHTML = '<div class="error-msg">Email required.</div>';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return errBox.innerHTML = '<div class="error-msg">Invalid email format.</div>';
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return errBox.innerHTML = '<div class="error-msg">Valid email required.</div>';
     if (!password || password.length < 6) return errBox.innerHTML = '<div class="error-msg">Password must be at least 6 characters.</div>';
     if (password !== confirm) return errBox.innerHTML = '<div class="error-msg">Passwords do not match.</div>';
     if (!address) return errBox.innerHTML = '<div class="error-msg">Address required.</div>';
-    if (!signupLocation.lat || !signupLocation.lng) return errBox.innerHTML = '<div class="error-msg">📍 Please set your store pickup location using "Use My Current Location" or pin on map.</div>';
+    if (!signupLocation.lat || !signupLocation.lng) return errBox.innerHTML = '<div class="error-msg">📍 Please set your store pickup location.</div>';
 
     const passwordHash = await hashPassword(password);
-    state.merchant = {
-      storeName, ownerName, phone: loginFlow.phone, email, passwordHash,
-      securityQ1: storeName, securityQ2: ownerName,
-      category, address, hours, deliveryArea,
-      location: { lat: signupLocation.lat, lng: signupLocation.lng },
-      createdAt: new Date().toISOString()
-    };
+    state.merchant = { storeName, ownerName, phone: loginFlow.phone, email, passwordHash, securityQ1: storeName, securityQ2: ownerName, category, address, hours, deliveryArea, location: { lat: signupLocation.lat, lng: signupLocation.lng }, createdAt: new Date().toISOString() };
     state.products = [];
     try {
       await setDoc(doc(db, "merchants", loginFlow.phone), { merchant: state.merchant, products: [], updatedAt: new Date().toISOString() });
-      saveLocal(); closeModal();
-      loadOrders(); loadPayouts(); loadSettings(); updateOpenStatus();
+      saveLocal(); closeModal(); loadOrders(); loadPayouts(); loadSettings(); updateOpenStatus();
       document.getElementById('storeNameTop').textContent = state.merchant.storeName;
       render();
-      toast("Business registered! 🎉");
+      toast("Business registered!", "success");
       requestFcmToken();
     } catch (e) { console.error(e); errBox.innerHTML = '<div class="error-msg">Failed to register. Try again.</div>'; }
   }
 
   function startPasswordReset() { loginFlow = { step: 1, phone: "", email: "", merchantData: null, mode: "reset" }; renderAuthModal(); }
+  async function resetSubmitPhone() { const input = document.getElementById('resetPhone').value.trim(); const errBox = document.getElementById('resetError'); if (!input) { errBox.innerHTML = '<div class="error-msg">Enter phone number.</div>'; return; } const phone = normalizePhone(input); loginFlow.phone = phone; toast("Checking...", "info"); try { const snap = await getDoc(doc(db, "merchants", phone)); if (!snap.exists()) { errBox.innerHTML = '<div class="error-msg">❌ No account found.</div>'; return; } loginFlow.merchantData = snap.data(); loginFlow.step = 2; renderAuthModal(); } catch (e) { errBox.innerHTML = '<div class="error-msg">Network error.</div>'; } }
+  function resetSubmitEmail() { const email = document.getElementById('resetEmail').value.trim().toLowerCase(); const errBox = document.getElementById('resetError'); if (!email) { errBox.innerHTML = '<div class="error-msg">Enter email.</div>'; return; } const storedEmail = (loginFlow.merchantData?.merchant?.email || "").toLowerCase(); if (email !== storedEmail) { errBox.innerHTML = '<div class="error-msg">❌ Data doesn\'t match.</div>'; return; } loginFlow.email = email; loginFlow.step = 3; renderAuthModal(); }
+  function resetSubmitQuestions() { const q1 = document.getElementById('resetQ1').value.trim().toLowerCase(); const q2 = document.getElementById('resetQ2').value.trim().toLowerCase(); const errBox = document.getElementById('resetError'); if (!q1 && !q2) { errBox.innerHTML = '<div class="error-msg">Answer at least one question.</div>'; return; } const correct1 = (loginFlow.merchantData?.merchant?.securityQ1 || "").toLowerCase(); const correct2 = (loginFlow.merchantData?.merchant?.securityQ2 || "").toLowerCase(); if (!(q1 && q1 === correct1) && !(q2 && q2 === correct2)) { errBox.innerHTML = '<div class="error-msg">❌ Neither answer matched.</div>'; return; } loginFlow.step = 4; renderAuthModal(); }
+  async function resetSaveNewPassword() { const newPass = document.getElementById('resetNewPass').value; const confirm = document.getElementById('resetNewConfirm').value; const errBox = document.getElementById('resetError'); if (!newPass || newPass.length < 6) { errBox.innerHTML = '<div class="error-msg">Password must be at least 6 characters.</div>'; return; } if (newPass !== confirm) { errBox.innerHTML = '<div class="error-msg">Passwords do not match.</div>'; return; } try { const newHash = await hashPassword(newPass); await updateDoc(doc(db, "merchants", loginFlow.phone), { "merchant.passwordHash": newHash, "merchant.passwordUpdatedAt": new Date().toISOString() }); toast("Password reset successful", "success"); setTimeout(() => openAuth(), 800); } catch (e) { errBox.innerHTML = '<div class="error-msg">Failed to reset. Try again.</div>'; } }
 
-  async function resetSubmitPhone() {
-    const input = document.getElementById('resetPhone').value.trim();
-    const errBox = document.getElementById('resetError');
-    if (!input) { errBox.innerHTML = '<div class="error-msg">Enter phone number.</div>'; return; }
-    const phone = normalizePhone(input);
-    loginFlow.phone = phone;
-    toast("Checking...");
-    try {
-      const snap = await getDoc(doc(db, "merchants", phone));
-      if (!snap.exists()) { errBox.innerHTML = '<div class="error-msg">❌ No account found with this number.</div>'; return; }
-      loginFlow.merchantData = snap.data();
-      loginFlow.step = 2;
-      renderAuthModal();
-    } catch (e) { console.error(e); errBox.innerHTML = '<div class="error-msg">Network error.</div>'; }
+  // ============================================
+  // EMPTY ILLUSTRATIONS
+  // ============================================
+  function emptyOrdersSVG() {
+    return `<svg viewBox="0 0 200 200" fill="none"><circle cx="100" cy="100" r="70" fill="#D1FAE5" opacity="0.5"/><rect x="55" y="70" width="90" height="70" rx="8" stroke="#059669" stroke-width="3" fill="white"/><path d="M55 85h90" stroke="#059669" stroke-width="3"/><rect x="65" y="95" width="40" height="8" rx="2" fill="#059669" opacity="0.4"/><rect x="65" y="110" width="60" height="8" rx="2" fill="#059669" opacity="0.3"/></svg>`;
   }
-
-  function resetSubmitEmail() {
-    const email = document.getElementById('resetEmail').value.trim().toLowerCase();
-    const errBox = document.getElementById('resetError');
-    if (!email) { errBox.innerHTML = '<div class="error-msg">Enter email.</div>'; return; }
-    const storedEmail = (loginFlow.merchantData?.merchant?.email || "").toLowerCase();
-    if (email !== storedEmail) { errBox.innerHTML = '<div class="error-msg">❌ Data doesn\'t match.</div>'; return; }
-    loginFlow.email = email;
-    loginFlow.step = 3;
-    renderAuthModal();
-  }
-
-  function resetSubmitQuestions() {
-    const q1 = document.getElementById('resetQ1').value.trim().toLowerCase();
-    const q2 = document.getElementById('resetQ2').value.trim().toLowerCase();
-    const errBox = document.getElementById('resetError');
-    if (!q1 && !q2) { errBox.innerHTML = '<div class="error-msg">Answer at least one question.</div>'; return; }
-    const correct1 = (loginFlow.merchantData?.merchant?.securityQ1 || "").toLowerCase();
-    const correct2 = (loginFlow.merchantData?.merchant?.securityQ2 || "").toLowerCase();
-    const q1Correct = q1 && q1 === correct1;
-    const q2Correct = q2 && q2 === correct2;
-    if (!q1Correct && !q2Correct) { errBox.innerHTML = '<div class="error-msg">❌ Neither answer matched. Try again.</div>'; return; }
-    loginFlow.step = 4;
-    renderAuthModal();
-  }
-
-  async function resetSaveNewPassword() {
-    const newPass = document.getElementById('resetNewPass').value;
-    const confirm = document.getElementById('resetNewConfirm').value;
-    const errBox = document.getElementById('resetError');
-    if (!newPass || newPass.length < 6) { errBox.innerHTML = '<div class="error-msg">Password must be at least 6 characters.</div>'; return; }
-    if (newPass !== confirm) { errBox.innerHTML = '<div class="error-msg">Passwords do not match.</div>'; return; }
-    try {
-      const newHash = await hashPassword(newPass);
-      await updateDoc(doc(db, "merchants", loginFlow.phone), { "merchant.passwordHash": newHash, "merchant.passwordUpdatedAt": new Date().toISOString() });
-      toast("✅ Password reset successful! Please login.");
-      setTimeout(() => openAuth(), 800);
-    } catch (e) { console.error(e); errBox.innerHTML = '<div class="error-msg">Failed to reset. Try again.</div>'; }
+  function emptyProductsSVG() {
+    return `<svg viewBox="0 0 200 200" fill="none"><circle cx="100" cy="100" r="70" fill="#FEF3C7" opacity="0.5"/><path d="M70 70l10-20h40l10 20" stroke="#F59E0B" stroke-width="3" fill="none" stroke-linejoin="round"/><rect x="60" y="70" width="80" height="65" rx="8" stroke="#F59E0B" stroke-width="3" fill="white"/><circle cx="85" cy="105" r="5" fill="#F59E0B" opacity="0.3"/><circle cx="115" cy="105" r="5" fill="#F59E0B" opacity="0.3"/></svg>`;
   }
 
   function renderHome() {
@@ -531,24 +456,24 @@ p { font-size: 13px; color: var(--text-light); }
     const pendingCount = state.orders.filter(o => o.status === "Placed").length;
     const hasLocation = state.merchant.location && state.merchant.location.lat;
     return `<h2>Welcome, ${state.merchant.storeName}</h2>
-      ${!hasLocation ? `<div class="card" style="background:#fee2e2;border-left:4px solid var(--danger);"><p style="font-size:13px;color:#991b1b;font-weight:600;">⚠️ Store pickup location not set! Go to Profile → Update Location to enable rider navigation.</p></div>` : ''}
-      ${pendingCount > 0 ? `<div class="card order-card new" onclick="state.tab='orders';render();" style="cursor:pointer;"><div style="display:flex;justify-content:space-between;align-items:center;"><div><h3 style="color:var(--danger);">🔔 ${pendingCount} New Order${pendingCount > 1 ? 's' : ''}!</h3><p style="margin-top:4px;">Tap to accept</p></div><div style="font-size:24px;">→</div></div></div>` : ''}
+      ${!hasLocation ? `<div class="card" style="background:#FEE2E2;border-left:4px solid var(--danger);"><p style="font-size:13px;color:#991B1B;font-weight:700;">⚠️ Store pickup location not set! Go to Profile → Update Location</p></div>` : ''}
+      ${pendingCount > 0 ? `<div class="card order-card new" onclick="state.tab='orders';render();" style="cursor:pointer;"><div style="display:flex;justify-content:space-between;align-items:center;"><div><h3 style="color:var(--danger);">🔔 ${pendingCount} New Order${pendingCount > 1 ? 's' : ''}!</h3><p style="margin-top:4px;font-weight:500;">Tap to accept</p></div><span style="font-size:22px;color:var(--danger);">→</span></div></div>` : ''}
       <div class="stat-grid">
-        <div class="stat-box accent"><div class="num">Rs ${todayNet}</div><div class="lbl">Today (After Commission)</div></div>
+        <div class="stat-box accent"><div class="num">Rs ${todayNet}</div><div class="lbl">Today's Net Earnings</div></div>
         <div class="stat-box"><div class="num">${todayOrders.length}</div><div class="lbl">Today's Orders</div></div>
         <div class="stat-box"><div class="num">Rs ${todaySales}</div><div class="lbl">Gross Sales</div></div>
         <div class="stat-box"><div class="num">${state.products.length}</div><div class="lbl">Products</div></div>
         <div class="stat-box"><div class="num">Rs ${todayCommission}</div><div class="lbl">SwatGo Fee (${state.commissionRate}%)</div></div>
       </div>
-      <h2 style="margin-top:20px;">Quick Actions</h2>
+      <h2 style="margin-top:20px;">⚡ Quick Actions</h2>
       <div style="display:flex;gap:8px;margin-bottom:12px;"><button class="btn btn-outline" style="flex:1;" onclick="state.tab='products';addProductModal();">➕ Add Product</button><button class="btn btn-outline" style="flex:1;" onclick="state.tab='orders';render();">📦 View Orders</button></div>
-      <div class="card"><div class="toggle-row"><div><b>${state.isOpen ? '🟢 Open' : '🔴 Closed'}</b><p style="font-size:12px;margin-top:2px;">${state.isOpen ? 'Accepting orders' : 'Not accepting'}</p></div><div class="switch ${state.isOpen ? 'on' : ''}" onclick="toggleOpen();render();"></div></div></div>`;
+      <div class="card"><div class="toggle-row"><div><b>${state.isOpen ? '🟢 Store is Open' : '🔴 Store is Closed'}</b><p style="font-size:12px;margin-top:2px;font-weight:500;">${state.isOpen ? 'Accepting orders' : 'Not accepting orders'}</p></div><div class="switch ${state.isOpen ? 'on' : ''}" onclick="toggleOpen();render();"></div></div></div>`;
   }
 
   function renderOrders() {
     if (!state.merchant) return renderLoginPrompt();
-    if (state.orders.length === 0) return '<div class="empty"><span class="big">📭</span>No orders yet</div>';
-    return `<h2>Orders (${state.orders.length})</h2>${state.orders.map(o => {
+    if (state.orders.length === 0) return `<h2>📦 Orders</h2><div class="empty">${emptyOrdersSVG()}<h3>No orders yet</h3><p>Your incoming orders will appear here</p></div>`;
+    return `<h2>📦 Orders (${state.orders.length})</h2>${state.orders.map(o => {
       const myItems = (o.items || []).filter(i => i.shopName && i.shopName.toLowerCase() === state.merchant.storeName.toLowerCase());
       const mySubtotal = myItems.reduce((s, i) => s + i.price * i.qty, 0);
       const myCommission = Math.round(mySubtotal * (state.commissionRate / 100));
@@ -561,22 +486,22 @@ p { font-size: 13px; color: var(--text-light); }
       const isCancelled = ["Cancelled", "Rejected"].includes(o.status);
       const cls = isPending ? "pending" : isAccepted ? "accepted" : isReady ? "ready" : isDone ? "delivered" : isCancelled ? "cancelled" : hasRider ? "assigned" : "";
       return `<div class="card order-card ${isPending ? 'new' : ''}">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><b>#${o.id}</b><span class="status-chip ${cls}">${o.status}</span></div>
-        <p style="font-size:12px;color:var(--text-light);margin-bottom:8px;">${new Date(o.createdAt).toLocaleString()}</p>
-        <div style="background:#f8fafc;border-radius:10px;padding:10px;margin-bottom:10px;"><div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:6px;">Your Items:</div>${myItems.map(i => `<div style="font-size:13px;display:flex;justify-content:space-between;padding:3px 0;"><span>${i.name} × ${i.qty}</span><span>Rs ${i.price * i.qty}</span></div>`).join("")}<div style="border-top:1px dashed #cbd5e1;margin-top:6px;padding-top:6px;font-size:13px;"><div style="display:flex;justify-content:space-between;color:var(--text-light);"><span>Subtotal</span><span>Rs ${mySubtotal}</span></div><div style="display:flex;justify-content:space-between;color:var(--danger);"><span>SwatGo Fee (${state.commissionRate}%)</span><span>-Rs ${myCommission}</span></div><div style="display:flex;justify-content:space-between;font-weight:700;color:var(--success);"><span>You Earn</span><span>Rs ${myNet}</span></div></div></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><b style="font-weight:800;font-size:15px;">#${o.id}</b><span class="status-chip ${cls}">${o.status}</span></div>
+        <p style="font-size:11px;color:var(--text-light);margin-bottom:10px;font-weight:500;">${new Date(o.createdAt).toLocaleString()}</p>
+        <div style="background:var(--bg);border-radius:12px;padding:12px;margin-bottom:10px;"><div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px;">Your Items:</div>${myItems.map(i => `<div style="font-size:13px;display:flex;justify-content:space-between;padding:3px 0;font-weight:500;"><span>${i.name} × ${i.qty}</span><span style="font-feature-settings:'tnum';">Rs ${i.price * i.qty}</span></div>`).join("")}<div style="border-top:1px dashed var(--border);margin-top:8px;padding-top:8px;font-size:13px;"><div style="display:flex;justify-content:space-between;color:var(--text-light);font-weight:500;"><span>Subtotal</span><span>Rs ${mySubtotal}</span></div><div style="display:flex;justify-content:space-between;color:var(--danger);font-weight:600;"><span>SwatGo Fee (${state.commissionRate}%)</span><span>-Rs ${myCommission}</span></div><div style="display:flex;justify-content:space-between;font-weight:800;color:var(--brand);"><span>You Earn</span><span>Rs ${myNet}</span></div></div></div>
         <div class="order-row"><span>Customer</span><span>${o.userName || '-'}</span></div>
         <div class="order-row"><span>Phone</span><span>${o.userPhone || '-'}</span></div>
-        <div class="order-row"><span>Address</span><span style="font-size:12px;text-align:right;max-width:60%;">${o.address?.details || '-'}</span></div>
-        ${o.address?.instructions ? `<div class="order-row"><span>Note</span><span style="font-size:12px;color:var(--accent);">📝 ${o.address.instructions}</span></div>` : ''}
+        <div class="order-row"><span>Address</span><span style="font-size:11px;text-align:right;max-width:60%;">${o.address?.details || '-'}</span></div>
+        ${o.address?.instructions ? `<div class="order-row"><span>Note</span><span style="font-size:12px;color:var(--accent);font-weight:600;">📝 ${o.address.instructions}</span></div>` : ''}
         <div class="order-row"><span>Payment</span><span>${(o.pay || 'cod').toUpperCase()} • ${o.mode === 'delivery' ? 'Delivery' : 'Pickup'}</span></div>
-        ${o.rider ? `<div style="margin-top:10px;padding:10px;background:#f0fdf4;border-radius:10px;border-left:3px solid var(--success);"><div style="font-size:11px;color:var(--success);font-weight:700;margin-bottom:4px;">🛵 RIDER ACCEPTED</div><div class="order-row" style="padding:2px 0;"><span>Name</span><span>${o.rider.name || '-'}</span></div><div class="order-row" style="padding:2px 0;"><span>Phone</span><span>${o.rider.phone || '-'}</span></div><div class="order-row" style="padding:2px 0;"><span>Bike</span><span>${o.rider.bike || '-'}</span></div><div class="order-row" style="padding:2px 0;"><span>Rating</span><span>⭐ ${o.rider.rating || '5.0'}</span></div></div>` : ''}
+        ${o.rider ? `<div style="margin-top:12px;padding:12px;background:var(--brand-light);border-radius:12px;border-left:3px solid var(--brand);"><div style="font-size:11px;color:var(--brand-dark);font-weight:800;margin-bottom:6px;">🛵 RIDER ACCEPTED</div><div class="order-row" style="padding:2px 0;"><span>Name</span><span>${o.rider.name || '-'}</span></div><div class="order-row" style="padding:2px 0;"><span>Phone</span><span>${o.rider.phone || '-'}</span></div><div class="order-row" style="padding:2px 0;"><span>Bike</span><span>${o.rider.bike || '-'}</span></div></div>` : ''}
         <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
           ${isPending ? `<button class="btn btn-success btn-sm" style="flex:1;" onclick="acceptOrder('${o.id}')">✅ Accept</button><button class="btn btn-danger btn-sm" style="flex:1;" onclick="rejectOrder('${o.id}')">❌ Reject</button>` : ''}
           ${isAccepted ? `<button class="btn btn-warning btn-sm" style="flex:1;" onclick="markReady('${o.id}')">🛍️ Mark Ready for Pickup</button>` : ''}
-          ${isReady ? `<div style="flex:1;text-align:center;padding:10px;background:#fef3c7;border-radius:8px;font-size:12px;color:#92400e;font-weight:600;animation:pulse 1.5s infinite;">⏳ Waiting for rider...</div>` : ''}
-          ${hasRider ? `<div style="flex:1;text-align:center;padding:10px;background:#dbeafe;border-radius:8px;font-size:12px;color:#1e40af;font-weight:600;">🛵 ${o.status}</div>` : ''}
-          ${isDone ? `<div style="flex:1;text-align:center;padding:10px;background:#dcfce7;border-radius:8px;font-size:12px;color:#166534;font-weight:600;">✅ Completed</div>` : ''}
-          ${isCancelled ? `<div style="flex:1;text-align:center;padding:10px;background:#f3f4f6;border-radius:8px;font-size:12px;color:#6b7280;font-weight:600;">${o.status}</div>` : ''}
+          ${isReady ? `<div style="flex:1;text-align:center;padding:12px;background:var(--accent-light);border-radius:10px;font-size:12px;color:#92400E;font-weight:700;animation:pulse 1.5s infinite;">⏳ Waiting for rider...</div>` : ''}
+          ${hasRider ? `<div style="flex:1;text-align:center;padding:12px;background:#DBEAFE;border-radius:10px;font-size:12px;color:#1E40AF;font-weight:700;">🛵 ${o.status}</div>` : ''}
+          ${isDone ? `<div style="flex:1;text-align:center;padding:12px;background:var(--brand-light);border-radius:10px;font-size:12px;color:var(--brand-dark);font-weight:700;">✅ Completed</div>` : ''}
+          ${isCancelled ? `<div style="flex:1;text-align:center;padding:12px;background:#F1F5F9;border-radius:10px;font-size:12px;color:#64748B;font-weight:700;">${o.status}</div>` : ''}
         </div>
       </div>`;
     }).join("")}`;
@@ -584,9 +509,9 @@ p { font-size: 13px; color: var(--text-light); }
 
   function renderProducts() {
     if (!state.merchant) return renderLoginPrompt();
-    if (state.products.length === 0) return `<h2>Products</h2><div class="empty"><span class="big">🍔</span>No products yet</div><button class="btn btn-primary btn-block" onclick="addProductModal()">➕ Add First Product</button>`;
+    if (state.products.length === 0) return `<h2>🍔 Products</h2><div class="empty">${emptyProductsSVG()}<h3>No products yet</h3><p>Add your first product to start selling</p><button class="btn btn-primary" onclick="addProductModal()">➕ Add First Product</button></div>`;
     const grouped = {}; state.products.forEach(p => { const cat = p.category || "General"; if (!grouped[cat]) grouped[cat] = []; grouped[cat].push(p); });
-    return `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><h2 style="margin:0;">Products (${state.products.length})</h2><button class="btn btn-primary btn-sm" onclick="addProductModal()">➕ Add</button></div>${Object.keys(grouped).map(cat => `<div class="card"><h3 style="font-size:14px;color:var(--accent);margin-bottom:8px;">${cat}</h3>${grouped[cat].map(p => `<div class="product-item"><div class="prod-info"><h4>${p.name} ${p.stock === false ? '<span style="color:var(--danger);font-size:10px;">(Out of Stock)</span>' : ''}</h4><p>${p.desc || '-'}</p><div class="prod-price">Rs ${p.price}</div></div><div class="prod-actions"><button class="btn btn-outline btn-sm" onclick="addProductModal('${p.id}')">✏️</button><button class="btn btn-outline btn-sm" style="color:var(--danger);" onclick="deleteProduct('${p.id}')">🗑️</button></div></div>`).join("")}</div>`).join("")}`;
+    return `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><h2 style="margin:0;">🍔 Products (${state.products.length})</h2><button class="btn btn-primary btn-sm" onclick="addProductModal()">➕ Add</button></div>${Object.keys(grouped).map(cat => `<div class="card"><h3 style="font-size:13px;color:var(--brand);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px;">${cat}</h3>${grouped[cat].map(p => `<div class="product-item"><div class="prod-info"><h4>${p.name} ${p.stock === false ? '<span style="color:var(--danger);font-size:10px;font-weight:700;">(Out of Stock)</span>' : ''}</h4><p>${p.desc || '-'}</p><div class="prod-price">Rs ${p.price}</div></div><div class="prod-actions"><button class="btn btn-outline btn-sm" onclick="addProductModal('${p.id}')">✏️</button><button class="btn btn-outline btn-sm" style="color:var(--danger);" onclick="deleteProduct('${p.id}')">🗑️</button></div></div>`).join("")}</div>`).join("")}`;
   }
 
   function renderEarnings() {
@@ -602,76 +527,60 @@ p { font-size: 13px; color: var(--text-light); }
     const paidPayouts = state.payouts.filter(p => p.status === "paid").reduce((s, p) => s + (p.amount || 0), 0);
     const pendingPayouts = state.payouts.filter(p => p.status === "pending").reduce((s, p) => s + (p.amount || 0), 0);
     const availableBalance = Math.max(0, allStats.net - paidPayouts - pendingPayouts);
-    return `<h2>Earnings</h2>
+    return `<h2>💰 Earnings</h2>
       <div class="stat-grid"><div class="stat-box accent"><div class="num">Rs ${availableBalance}</div><div class="lbl">Available Balance</div></div><div class="stat-box"><div class="num">Rs ${todayStats.net}</div><div class="lbl">Today</div></div></div>
-      <div class="card"><h3 style="margin-bottom:10px;font-size:14px;">📊 Sales Summary</h3><div class="order-row"><span>Today</span><span>Rs ${todayStats.net} (${todayStats.count})</span></div><div class="order-row"><span>This Week</span><span>Rs ${weekStats.net} (${weekStats.count})</span></div><div class="order-row"><span>This Month</span><span>Rs ${monthStats.net} (${monthStats.count})</span></div><div class="order-row" style="border-top:1px solid var(--border);padding-top:10px;margin-top:10px;"><span><b>Lifetime</b></span><span><b>Rs ${allStats.net}</b></span></div></div>
-      <div class="card"><h3 style="margin-bottom:10px;font-size:14px;">💼 Commission Breakdown</h3><div class="order-row"><span>Gross Sales</span><span>Rs ${allStats.gross}</span></div><div class="order-row" style="color:var(--danger);"><span>SwatGo Fee (${state.commissionRate}%)</span><span>-Rs ${allStats.commission}</span></div><div class="order-row" style="border-top:1px solid var(--border);padding-top:10px;margin-top:10px;color:var(--success);font-weight:700;"><span>Net Earnings</span><span>Rs ${allStats.net}</span></div></div>
-      <div class="card"><h3 style="margin-bottom:10px;font-size:14px;">💸 Payout History</h3><div class="order-row"><span>Total Paid Out</span><span>Rs ${paidPayouts}</span></div><div class="order-row"><span>Pending</span><span>Rs ${pendingPayouts}</span></div>${state.payouts.length === 0 ? `<p style="font-size:12px;color:var(--text-light);margin-top:8px;">No payout requests yet.</p>` : state.payouts.slice(0, 5).map(p => `<div class="payout-item"><div><b>Rs ${p.amount}</b><br><span style="font-size:11px;color:var(--text-light);">${new Date(p.requestedAt).toLocaleDateString()}</span></div><div><span class="status-chip ${p.status === 'pending' ? 'pending' : 'delivered'}">${p.status}</span></div></div>`).join("")}</div>
+      <div class="card"><h3 style="margin-bottom:12px;font-size:14px;">📊 Sales Summary</h3><div class="order-row"><span>Today</span><span>Rs ${todayStats.net} (${todayStats.count})</span></div><div class="order-row"><span>This Week</span><span>Rs ${weekStats.net} (${weekStats.count})</span></div><div class="order-row"><span>This Month</span><span>Rs ${monthStats.net} (${monthStats.count})</span></div><div class="order-row" style="border-top:1px solid var(--border);padding-top:10px;margin-top:10px;"><span><b>Lifetime</b></span><span><b>Rs ${allStats.net}</b></span></div></div>
+      <div class="card"><h3 style="margin-bottom:12px;font-size:14px;">💼 Commission Breakdown</h3><div class="order-row"><span>Gross Sales</span><span>Rs ${allStats.gross}</span></div><div class="order-row" style="color:var(--danger);"><span>SwatGo Fee (${state.commissionRate}%)</span><span>-Rs ${allStats.commission}</span></div><div class="order-row" style="border-top:1px solid var(--border);padding-top:10px;margin-top:10px;color:var(--brand);font-weight:800;"><span>Net Earnings</span><span>Rs ${allStats.net}</span></div></div>
+      <div class="card"><h3 style="margin-bottom:12px;font-size:14px;">💸 Payout History</h3><div class="order-row"><span>Total Paid Out</span><span>Rs ${paidPayouts}</span></div><div class="order-row"><span>Pending</span><span>Rs ${pendingPayouts}</span></div>${state.payouts.length === 0 ? `<p style="font-size:12px;color:var(--text-light);margin-top:8px;font-weight:500;">No payout requests yet.</p>` : state.payouts.slice(0, 5).map(p => `<div class="payout-item"><div><b>Rs ${p.amount}</b><br><span style="font-size:11px;color:var(--text-light);font-weight:500;">${new Date(p.requestedAt).toLocaleDateString()}</span></div><div><span class="status-chip ${p.status === 'pending' ? 'pending' : 'delivered'}">${p.status}</span></div></div>`).join("")}</div>
       <button class="btn btn-primary btn-block" onclick="requestPayout()">💸 Request Payout</button>`;
   }
 
   async function requestPayout() {
-    if (!state.merchant) return toast("Login first");
+    if (!state.merchant) return toast("Login first", "warning");
     const total = state.orders.filter(o => o.status === "Delivered").reduce((sum, o) => { const items = (o.items || []).filter(i => i.shopName && i.shopName.toLowerCase() === state.merchant.storeName.toLowerCase()); const sub = items.reduce((s, i) => s + i.price * i.qty, 0); return sum + (sub - Math.round(sub * (state.commissionRate / 100))); }, 0);
     const pending = state.payouts.filter(p => p.status === "pending").reduce((s, p) => s + (p.amount || 0), 0);
     const paid = state.payouts.filter(p => p.status === "paid").reduce((s, p) => s + (p.amount || 0), 0);
     const available = total - pending - paid;
-    if (available < 500) return toast("Min Rs 500. Available: Rs " + Math.max(0, Math.round(available)));
+    if (available < 500) return toast("Min Rs 500. Available: Rs " + Math.max(0, Math.round(available)), "warning");
     const amount = prompt(`Available: Rs ${Math.round(available)}\n\nEnter amount (min Rs 500):`, Math.round(available));
     if (!amount) return;
     const amt = parseInt(amount);
-    if (amt < 500 || amt > available) return toast("Invalid amount");
+    if (amt < 500 || amt > available) return toast("Invalid amount", "error");
     try {
       const payoutId = "PO" + Date.now().toString().slice(-8);
       await setDoc(doc(db, "payouts", payoutId), { id: payoutId, type: "merchant", merchantName: state.merchant.storeName, merchantPhone: state.merchant.phone, amount: amt, status: "pending", requestedAt: new Date().toISOString() });
-      toast("Payout requested ✅");
-    } catch (e) { console.error(e); toast("Failed"); }
+      toast("Payout requested", "success");
+    } catch (e) { console.error(e); toast("Failed", "error"); }
   }
 
   function renderProfile() {
     if (!state.merchant) return renderLoginPrompt();
     const cat = CATEGORIES.find(c => c.key === state.merchant.category) || CATEGORIES[5];
     const hasLocation = state.merchant.location && state.merchant.location.lat;
-    const locDisplay = hasLocation ? `✅ ${state.merchant.location.lat.toFixed(5)}, ${state.merchant.location.lng.toFixed(5)}` : '⚠️ Not set';
-    return `<div class="card"><div style="display:flex;align-items:center;gap:16px;"><div style="width:60px;height:60px;border-radius:14px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;">${cat.emoji}</div><div><h3>${state.merchant.storeName}</h3><p style="font-size:13px;color:var(--text-light);">${state.merchant.phone}</p><p style="font-size:12px;color:var(--accent);margin-top:2px;">${cat.label}</p></div></div></div>
+    const locDisplay = hasLocation ? `✅ Set (${state.merchant.location.lat.toFixed(3)}, ${state.merchant.location.lng.toFixed(3)})` : '⚠️ Not set';
+    return `<div class="card"><div style="display:flex;align-items:center;gap:16px;"><div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#059669,#047857);color:#fff;display:flex;align-items:center;justify-content:center;font-size:30px;">${cat.emoji}</div><div><h3 style="font-size:17px;">${state.merchant.storeName}</h3><p style="font-size:13px;color:var(--text-light);font-weight:500;">${state.merchant.phone}</p><p style="font-size:12px;color:var(--brand);margin-top:2px;font-weight:700;">${cat.label}</p></div></div></div>
     <div class="card">
-      <div class="order-row" style="cursor:pointer;padding:14px 0;border-bottom:1px solid var(--border);" onclick="editStore()"><span>🏪 Store Name</span><span style="color:var(--text-light);font-size:12px;">${state.merchant.storeName} ›</span></div>
-      <div class="order-row" style="padding:14px 0;border-bottom:1px solid var(--border);"><span>👤 Owner</span><span style="color:var(--text-light);font-size:12px;">${state.merchant.ownerName || 'Not set'}</span></div>
-      <div class="order-row" style="padding:14px 0;border-bottom:1px solid var(--border);"><span>✉️ Email</span><span style="color:var(--text-light);font-size:12px;">${state.merchant.email || 'Not set'}</span></div>
-      <div class="order-row" style="padding:14px 0;border-bottom:1px solid var(--border);"><span>📍 Address</span><span style="color:var(--text-light);font-size:12px;text-align:right;max-width:60%;">${state.merchant.address || 'Not set'}</span></div>
-      <div class="order-row" style="cursor:pointer;padding:14px 0;border-bottom:1px solid var(--border);" onclick="editPickupLocation()"><span>🎯 Pickup Location</span><span style="color:${hasLocation ? 'var(--success)' : 'var(--danger)'};font-size:11px;font-weight:600;">${locDisplay} ›</span></div>
-      <div class="order-row" style="cursor:pointer;padding:14px 0;border-bottom:1px solid var(--border);" onclick="editHours()"><span>🕒 Hours</span><span style="color:var(--text-light);font-size:12px;">${state.merchant.hours || 'Not set'} ›</span></div>
-      <div class="order-row" style="cursor:pointer;padding:14px 0;" onclick="editDeliveryArea()"><span>🗺️ Delivery Area</span><span style="color:var(--text-light);font-size:12px;">${state.merchant.deliveryArea || 'Not set'} ›</span></div>
+      <div class="order-row" style="cursor:pointer;padding:14px 0;border-bottom:1px solid var(--border);" onclick="editStore()"><span>🏪 Store Name</span><span style="color:var(--text-light);font-size:12px;font-weight:600;">${state.merchant.storeName} ›</span></div>
+      <div class="order-row" style="padding:14px 0;border-bottom:1px solid var(--border);"><span>👤 Owner</span><span style="color:var(--text-light);font-size:12px;font-weight:600;">${state.merchant.ownerName || 'Not set'}</span></div>
+      <div class="order-row" style="padding:14px 0;border-bottom:1px solid var(--border);"><span>✉️ Email</span><span style="color:var(--text-light);font-size:12px;font-weight:600;">${state.merchant.email || 'Not set'}</span></div>
+      <div class="order-row" style="padding:14px 0;border-bottom:1px solid var(--border);"><span>📍 Address</span><span style="color:var(--text-light);font-size:12px;text-align:right;max-width:60%;font-weight:600;">${state.merchant.address || 'Not set'}</span></div>
+      <div class="order-row" style="cursor:pointer;padding:14px 0;border-bottom:1px solid var(--border);" onclick="editPickupLocation()"><span>🎯 Pickup Location</span><span style="color:${hasLocation ? 'var(--success)' : 'var(--danger)'};font-size:11px;font-weight:700;">${locDisplay} ›</span></div>
+      <div class="order-row" style="cursor:pointer;padding:14px 0;border-bottom:1px solid var(--border);" onclick="editHours()"><span>🕒 Hours</span><span style="color:var(--text-light);font-size:12px;font-weight:600;">${state.merchant.hours || 'Not set'} ›</span></div>
+      <div class="order-row" style="cursor:pointer;padding:14px 0;" onclick="editDeliveryArea()"><span>🗺️ Delivery Area</span><span style="color:var(--text-light);font-size:12px;font-weight:600;">${state.merchant.deliveryArea || 'Not set'} ›</span></div>
     </div>
-    <div class="card"><div class="toggle-row"><span>💰 Commission Rate</span><span style="font-weight:700;color:var(--accent);">${state.commissionRate}%</span></div><div class="toggle-row"><span>📞 Support</span><span style="font-size:12px;color:var(--text-light);">support@swatgo.com</span></div></div>
+    <div class="card"><div class="toggle-row"><span>💰 Commission Rate</span><span style="font-weight:800;color:var(--accent);">${state.commissionRate}%</span></div><div class="toggle-row"><span>📞 Support</span><span style="font-size:12px;color:var(--text-light);font-weight:500;">support@swatgo.com</span></div></div>
     <button class="btn btn-danger btn-block" onclick="logout()">Logout</button>`;
   }
 
-  function editStore() { const name = prompt("Store Name:", state.merchant.storeName); if (!name || !name.trim()) return; state.merchant.storeName = name.trim(); state.merchant.securityQ1 = name.trim(); saveLocal(); saveMerchantToFirebase(); render(); toast("Updated"); }
-  function editHours() { const hours = prompt("Hours:", state.merchant.hours || ""); if (!hours) return; state.merchant.hours = hours; saveLocal(); saveMerchantToFirebase(); render(); toast("Updated"); }
-  function editDeliveryArea() { const area = prompt("Delivery Area:", state.merchant.deliveryArea || ""); if (!area) return; state.merchant.deliveryArea = area; saveLocal(); saveMerchantToFirebase(); render(); toast("Updated"); }
-
-  // ============================================
-  // EDIT PICKUP LOCATION
-  // ============================================
-  let editMap = null, editMarker = null;
-  let editLocation = { lat: null, lng: null };
+  function editStore() { const name = prompt("Store Name:", state.merchant.storeName); if (!name || !name.trim()) return; state.merchant.storeName = name.trim(); state.merchant.securityQ1 = name.trim(); saveLocal(); saveMerchantToFirebase(); render(); toast("Updated", "success"); }
+  function editHours() { const hours = prompt("Hours:", state.merchant.hours || ""); if (!hours) return; state.merchant.hours = hours; saveLocal(); saveMerchantToFirebase(); render(); toast("Updated", "success"); }
+  function editDeliveryArea() { const area = prompt("Delivery Area:", state.merchant.deliveryArea || ""); if (!area) return; state.merchant.deliveryArea = area; saveLocal(); saveMerchantToFirebase(); render(); toast("Updated", "success"); }
 
   function editPickupLocation() {
     if (!state.merchant) return;
     editLocation.lat = state.merchant.location?.lat || null;
     editLocation.lng = state.merchant.location?.lng || null;
-    document.getElementById("modalRoot").innerHTML = `<div class="overlay" onclick="if(event.target===this)closeModal()"><div class="sheet"><h3>🎯 Store Pickup Location</h3>
-      <p style="font-size:12px;color:var(--text-light);margin-bottom:12px;">Riders will navigate to this exact location to pick up orders.</p>
-      <button type="button" class="btn btn-success btn-block" onclick="editGoToMyLocation()" style="margin-bottom:10px;">📍 Use My Current Location</button>
-      <div id="editPickupMap" style="width:100%;height:240px;border-radius:12px;margin-bottom:8px;background:var(--bg);"></div>
-      <p style="font-size:11px;text-align:center;color:var(--text-light);margin-bottom:12px;">🔴 Drag pin or tap map to adjust</p>
-      <label style="display:block;font-size:12px;color:var(--text-light);margin-bottom:4px;">Store Address</label>
-      <input id="editAddrDetails" placeholder="Store address" value="${state.merchant.address || ''}" style="width:100%;padding:14px;border:1px solid var(--border);border-radius:12px;font-size:14px;margin-bottom:12px;" />
-      <div id="editLocationStatus" style="font-size:12px;color:var(--text-light);margin-bottom:12px;"></div>
-      <button class="btn btn-primary btn-block" onclick="savePickupLocation()">Save Location</button>
-      <button class="btn btn-outline btn-block" style="margin-top:8px;" onclick="closeModal()">Cancel</button>
-    </div></div>`;
+    document.getElementById("modalRoot").innerHTML = `<div class="overlay" onclick="if(event.target===this)closeModal()"><div class="sheet"><h3>🎯 Store Pickup Location</h3><p style="font-size:12px;color:var(--text-light);margin-bottom:12px;font-weight:500;">Riders will navigate to this exact location.</p><button type="button" class="btn btn-success btn-block" onclick="editGoToMyLocation()" style="margin-bottom:10px;">📍 Use My Current Location</button><div id="editPickupMap"></div><p style="font-size:11px;text-align:center;color:var(--text-light);margin-bottom:12px;font-weight:500;">🔴 Drag pin or tap map</p><label class="form-label">Store Address</label><input id="editAddrDetails" placeholder="Store address" value="${state.merchant.address || ''}" /><div id="editLocationStatus" style="font-size:12px;color:var(--text-light);margin-bottom:12px;font-weight:600;"></div><button class="btn btn-primary btn-block" onclick="savePickupLocation()">Save Location</button><button class="btn btn-outline btn-block" style="margin-top:8px;" onclick="closeModal()">Cancel</button></div></div>`;
     setTimeout(() => initEditMap(), 200);
   }
 
@@ -680,57 +589,34 @@ p { font-size: 13px; color: var(--text-light); }
     const center = editLocation.lat && editLocation.lng ? { lat: editLocation.lat, lng: editLocation.lng } : { lat: 34.7717, lng: 72.3600 };
     editMap = new google.maps.Map(el, { center, zoom: 15, disableDefaultUI: true, zoomControl: true });
     editMarker = new google.maps.Marker({ position: center, map: editMap, draggable: true, icon: { url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png" } });
-    google.maps.event.addListener(editMarker, 'dragend', () => {
-      const pos = editMarker.getPosition();
-      editLocation.lat = pos.lat(); editLocation.lng = pos.lng();
-      updateEditStatus();
-      new google.maps.Geocoder().geocode({ location: { lat: pos.lat(), lng: pos.lng() } }, (results, status) => {
-        const addrInput = document.getElementById('editAddrDetails');
-        if (status === "OK" && results[0] && results[0].formatted_address && addrInput) addrInput.value = results[0].formatted_address;
-      });
-    });
-    editMap.addListener('click', (e) => {
-      editMarker.setPosition(e.latLng);
-      editLocation.lat = e.latLng.lat(); editLocation.lng = e.latLng.lng();
-      updateEditStatus();
-      new google.maps.Geocoder().geocode({ location: { lat: e.latLng.lat(), lng: e.latLng.lng() } }, (results, status) => {
-        const addrInput = document.getElementById('editAddrDetails');
-        if (status === "OK" && results[0] && results[0].formatted_address && addrInput) addrInput.value = results[0].formatted_address;
-      });
-    });
+    const handleGeo = (lat, lng) => { new google.maps.Geocoder().geocode({ location: { lat, lng } }, (results, status) => { const addrInput = document.getElementById('editAddrDetails'); if (status === "OK" && results[0] && results[0].formatted_address && addrInput) addrInput.value = results[0].formatted_address; }); };
+    google.maps.event.addListener(editMarker, 'dragend', () => { const pos = editMarker.getPosition(); editLocation.lat = pos.lat(); editLocation.lng = pos.lng(); updateEditStatus(); handleGeo(pos.lat(), pos.lng()); });
+    editMap.addListener('click', (e) => { editMarker.setPosition(e.latLng); editLocation.lat = e.latLng.lat(); editLocation.lng = e.latLng.lng(); updateEditStatus(); handleGeo(e.latLng.lat(), e.latLng.lng()); });
     updateEditStatus();
   }
 
   function editGoToMyLocation() {
-    if (!navigator.geolocation) return toast("GPS not supported");
-    toast("Getting location...");
+    if (!navigator.geolocation) return toast("GPS not supported", "error");
+    toast("Getting location...", "info");
     navigator.geolocation.getCurrentPosition((pos) => {
       const lat = pos.coords.latitude, lng = pos.coords.longitude;
       editLocation.lat = lat; editLocation.lng = lng;
       if (editMap) { editMap.setCenter({ lat, lng }); editMap.setZoom(17); }
       if (editMarker) editMarker.setPosition({ lat, lng });
       updateEditStatus();
-      new google.maps.Geocoder().geocode({ location: { lat, lng } }, (results, status) => {
-        const addrInput = document.getElementById('editAddrDetails');
-        if (status === "OK" && results[0] && results[0].formatted_address && addrInput) addrInput.value = results[0].formatted_address;
-      });
-      toast("Location detected ✅");
-    }, (err) => { alert(err.code === 1 ? "🚫 Permission blocked." : "Error: " + err.message); }, { enableHighAccuracy: true, timeout: 15000 });
+      new google.maps.Geocoder().geocode({ location: { lat, lng } }, (results, status) => { const addrInput = document.getElementById('editAddrDetails'); if (status === "OK" && results[0] && results[0].formatted_address && addrInput) addrInput.value = results[0].formatted_address; });
+      toast("Location detected", "success");
+    }, (err) => { toast(err.code === 1 ? "Permission blocked" : "Error: " + err.message, "error"); }, { enableHighAccuracy: true, timeout: 15000 });
   }
 
   function updateEditStatus() {
     const el = document.getElementById("editLocationStatus"); if (!el) return;
-    if (editLocation.lat && editLocation.lng) {
-      el.innerHTML = `✅ Location: ${editLocation.lat.toFixed(5)}, ${editLocation.lng.toFixed(5)}`;
-      el.style.color = "var(--success)";
-    } else {
-      el.innerHTML = `⚠️ No location set`;
-      el.style.color = "var(--danger)";
-    }
+    if (editLocation.lat && editLocation.lng) { el.innerHTML = `✅ Location: ${editLocation.lat.toFixed(5)}, ${editLocation.lng.toFixed(5)}`; el.style.color = "var(--success)"; }
+    else { el.innerHTML = `⚠️ No location set`; el.style.color = "var(--danger)"; }
   }
 
   async function savePickupLocation() {
-    if (!editLocation.lat || !editLocation.lng) return toast("Please set pickup location");
+    if (!editLocation.lat || !editLocation.lng) return toast("Please set pickup location", "warning");
     const addr = document.getElementById('editAddrDetails').value.trim();
     state.merchant.location = { lat: editLocation.lat, lng: editLocation.lng };
     if (addr) state.merchant.address = addr;
@@ -738,10 +624,10 @@ p { font-size: 13px; color: var(--text-light); }
     await saveMerchantToFirebase();
     closeModal();
     render();
-    toast("Pickup location saved ✅");
+    toast("Pickup location saved", "success");
   }
 
-  function renderLoginPrompt() { return `<div class="card" style="text-align:center;padding:40px 20px;"><div style="font-size:64px;margin-bottom:16px;">🏪</div><h3 style="margin-bottom:8px;">Welcome to SwatGo Merchant</h3><p style="color:var(--text-light);font-size:13px;margin-bottom:20px;">Register your business</p><button class="btn btn-primary btn-block" onclick="openAuth()">Login / Register</button></div>`; }
+  function renderLoginPrompt() { return `<div class="card" style="text-align:center;padding:40px 20px;"><div style="font-size:64px;margin-bottom:16px;">🏪</div><h3 style="margin-bottom:8px;font-size:18px;">Welcome to SwatGo Merchant</h3><p style="color:var(--text-light);font-size:13px;margin-bottom:20px;font-weight:500;">Register your business to start selling</p><button class="btn btn-primary" style="padding:14px 30px;" onclick="openAuth()">Login / Register</button></div>`; }
 
   async function saveMerchantToFirebase() { if (!state.merchant) return; try { await setDoc(doc(db, "merchants", state.merchant.phone), { merchant: state.merchant, products: state.products, updatedAt: new Date().toISOString() }, { merge: true }); } catch (e) { console.error(e); } }
 
@@ -757,7 +643,7 @@ p { font-size: 13px; color: var(--text-light); }
     updateOpenStatus();
     state.tab = "home";
     render();
-    toast("Logged out");
+    toast("Logged out", "info");
   }
 
   function render() {
