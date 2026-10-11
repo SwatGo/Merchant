@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#0f172a" />
 <title>SwatGo Merchant</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLf8FDyUoWTFsiMu20azhnscWkiyCDE24"></script>
 <style>
 :root { --primary: #0f172a; --accent: #f59e0b; --success: #22c55e; --danger: #ef4444; --bg: #f1f5f9; --card: #ffffff; --text: #0f172a; --text-light: #64748b; --border: #e2e8f0; }
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -85,6 +86,7 @@ p { font-size: 13px; color: var(--text-light); }
 .info-msg { background: #dbeafe; color: #1e40af; padding: 10px 14px; border-radius: 10px; font-size: 12px; margin-bottom: 12px; text-align: center; }
 .success-msg { background: #dcfce7; color: #166534; padding: 10px 14px; border-radius: 10px; font-size: 13px; margin-bottom: 12px; text-align: center; font-weight: 500; }
 .link-btn { background: none; border: none; color: var(--accent); font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: underline; padding: 4px; }
+#pickupMap { width: 100%; height: 240px; border-radius: 12px; margin-bottom: 12px; border: 1px solid var(--border); background: var(--bg); }
 </style>
 </head>
 <body>
@@ -123,23 +125,18 @@ p { font-size: 13px; color: var(--text-light); }
   };
 
   let loginFlow = { step: 0, phone: "", email: "", merchantData: null, mode: "login" };
+  let signupLocation = { lat: null, lng: null, address: "" };
+  let signupMap = null, signupMarker = null;
 
   function toast(msg) { const t = document.getElementById("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(window._t); window._t = setTimeout(() => t.classList.remove("show"), 3000); }
-  function closeModal() { document.getElementById("modalRoot").innerHTML = ""; loginFlow = { step: 0, phone: "", email: "", merchantData: null, mode: "login" }; }
+  function closeModal() { document.getElementById("modalRoot").innerHTML = ""; loginFlow = { step: 0, phone: "", email: "", merchantData: null, mode: "login" }; signupLocation = { lat: null, lng: null, address: "" }; signupMap = null; signupMarker = null; }
   function saveLocal() { if (state.merchant) localStorage.setItem("syedgo_merchant", JSON.stringify(state.merchant)); localStorage.setItem("syedgo_merchant_open", state.isOpen); }
 
-  // ============================================
-  // FCM PUSH NOTIFICATION SETUP
-  // ============================================
+  // FCM
   async function requestFcmToken() {
-    if (!window.FcmBridge) {
-      console.log('FCM: Not running inside SwatGo native app — skipping');
-      return;
-    }
-    console.log('FCM: Requesting token from native app...');
+    if (!window.FcmBridge) return;
     window.onFcmTokenReceived = async function(token) {
-      if (!token) { console.log('FCM: Token not available'); return; }
-      console.log('FCM: Got token:', token);
+      if (!token) return;
       localStorage.setItem('swatgo_fcm_token', token);
       await saveFcmTokenToFirestore(token);
     };
@@ -147,19 +144,13 @@ p { font-size: 13px; color: var(--text-light); }
   }
 
   async function saveFcmTokenToFirestore(token) {
-    if (!state.merchant) { console.log('FCM: No merchant logged in, skip save'); return; }
+    if (!state.merchant) return;
     try {
       const phoneKey = state.merchant.phone.replace(/[^0-9]/g, '');
       await setDoc(doc(db, 'device_tokens', 'merchant_' + phoneKey), {
-        token: token,
-        userType: 'merchant',
-        userId: state.merchant.phone,
-        userName: state.merchant.storeName,
-        storeName: state.merchant.storeName,
-        updatedAt: new Date().toISOString(),
-        platform: 'android'
+        token: token, userType: 'merchant', userId: state.merchant.phone, userName: state.merchant.storeName, storeName: state.merchant.storeName,
+        updatedAt: new Date().toISOString(), platform: 'android'
       }, { merge: true });
-      console.log('FCM: Token saved to Firestore ✅ merchant_' + phoneKey);
     } catch (e) { console.error('FCM: Save failed:', e); }
   }
 
@@ -168,7 +159,6 @@ p { font-size: 13px; color: var(--text-light); }
     try {
       const phoneKey = state.merchant.phone.replace(/[^0-9]/g, '');
       await deleteDoc(doc(db, 'device_tokens', 'merchant_' + phoneKey));
-      console.log('FCM: Token removed from Firestore');
     } catch (e) { console.error('FCM: Remove failed:', e); }
   }
 
@@ -274,7 +264,31 @@ p { font-size: 13px; color: var(--text-light); }
         setTimeout(() => document.getElementById('authPassword')?.focus(), 100);
       }
     } else if (loginFlow.mode === "signup") {
-      modalRoot.innerHTML = `<div class="overlay"><div class="sheet"><h3>🏪 Register Your Business</h3><div class="info-msg">📱 ${loginFlow.phone}</div><label class="form-label">Store Name *</label><input class="form-input" id="sStoreName" placeholder="e.g. Al-Madina Superstore" /><label class="form-label">Owner Name *</label><input class="form-input" id="sOwnerName" placeholder="e.g. Ali Khan" /><label class="form-label">Email *</label><input class="form-input" id="sEmail" placeholder="you@example.com" type="email" /><label class="form-label">Password *</label><input class="form-input" id="sPassword" placeholder="Min 6 characters" type="password" /><label class="form-label">Confirm Password *</label><input class="form-input" id="sConfirm" placeholder="Repeat password" type="password" /><label class="form-label">Category *</label><select class="form-input" id="sCategory">${CATEGORIES.map(c => `<option value="${c.key}">${c.emoji} ${c.label}</option>`).join("")}</select><label class="form-label">Store Address *</label><input class="form-input" id="sAddress" placeholder="e.g. Mingora Bazaar, Swat" /><label class="form-label">Opening Hours</label><input class="form-input" id="sHours" value="8:00 AM - 11:00 PM" /><label class="form-label">Delivery Area (optional)</label><input class="form-input" id="sArea" placeholder="e.g. Mingora, Saidu Sharif" /><div id="signupError"></div><button class="btn btn-success btn-block" onclick="submitSignup()">Register Business</button><button class="btn btn-outline btn-block" style="margin-top:8px;" onclick="backToPhone()">← Back</button></div></div>`;
+      // NEW SIGNUP with location picker
+      modalRoot.innerHTML = `<div class="overlay"><div class="sheet"><h3>🏪 Register Your Business</h3><div class="info-msg">📱 ${loginFlow.phone}</div>
+        <label class="form-label">Store Name *</label><input class="form-input" id="sStoreName" placeholder="e.g. Al-Madina Superstore" />
+        <label class="form-label">Owner Name *</label><input class="form-input" id="sOwnerName" placeholder="e.g. Ali Khan" />
+        <label class="form-label">Email *</label><input class="form-input" id="sEmail" placeholder="you@example.com" type="email" />
+        <label class="form-label">Password *</label><input class="form-input" id="sPassword" placeholder="Min 6 characters" type="password" />
+        <label class="form-label">Confirm Password *</label><input class="form-input" id="sConfirm" placeholder="Repeat password" type="password" />
+        <label class="form-label">Category *</label><select class="form-input" id="sCategory">${CATEGORIES.map(c => `<option value="${c.key}">${c.emoji} ${c.label}</option>`).join("")}</select>
+        
+        <label class="form-label" style="font-weight:700;color:var(--accent);">📍 Store Location (Pickup Point) *</label>
+        <p style="font-size:11px;color:var(--text-light);margin-bottom:8px;">Riders will navigate to this exact location</p>
+        <button type="button" class="btn btn-success btn-block" onclick="signupGoToMyLocation()" style="margin-bottom:10px;">📍 Use My Current Location</button>
+        <div id="pickupMap"></div>
+        <p style="font-size:11px;text-align:center;color:var(--text-light);margin-bottom:12px;">🔴 Drag pin or tap map to adjust exact pickup location</p>
+        <label class="form-label">Store Address *</label>
+        <textarea class="form-input" id="sAddress" placeholder="e.g. Mingora Bazaar, Swat" rows="2" style="resize:none;"></textarea>
+        <div id="signupLocationStatus" style="font-size:11px;color:var(--text-light);margin-top:-8px;margin-bottom:12px;"></div>
+        
+        <label class="form-label">Opening Hours</label><input class="form-input" id="sHours" value="8:00 AM - 11:00 PM" />
+        <label class="form-label">Delivery Area (optional)</label><input class="form-input" id="sArea" placeholder="e.g. Mingora, Saidu Sharif" />
+        <div id="signupError"></div>
+        <button class="btn btn-success btn-block" onclick="submitSignup()">Register Business</button>
+        <button class="btn btn-outline btn-block" style="margin-top:8px;" onclick="backToPhone()">← Back</button>
+      </div></div>`;
+      setTimeout(() => initSignupMap(), 200);
     } else if (loginFlow.mode === "reset") {
       if (loginFlow.step === 1) {
         modalRoot.innerHTML = `<div class="overlay"><div class="sheet"><h3>🔐 Reset Password</h3><p style="font-size:13px;color:var(--text-light);margin-bottom:14px;">Enter your registered phone number.</p><label class="form-label">Phone Number</label><input class="form-input" id="resetPhone" placeholder="+92 300 1234567" type="tel" onkeypress="if(event.key==='Enter')resetSubmitPhone()" /><div id="resetError"></div><button class="btn btn-primary btn-block" onclick="resetSubmitPhone()">Continue</button><button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="openAuth()">← Back to Login</button></div></div>`;
@@ -287,6 +301,66 @@ p { font-size: 13px; color: var(--text-light); }
       } else if (loginFlow.step === 4) {
         modalRoot.innerHTML = `<div class="overlay"><div class="sheet"><h3>🔐 Set New Password</h3><div class="success-msg">✅ Identity verified</div><label class="form-label">New Password</label><input class="form-input" id="resetNewPass" type="password" placeholder="Min 6 characters" /><label class="form-label">Confirm New Password</label><input class="form-input" id="resetNewConfirm" type="password" placeholder="Repeat new password" /><div id="resetError"></div><button class="btn btn-success btn-block" onclick="resetSaveNewPassword()">Save New Password</button></div></div>`;
       }
+    }
+  }
+
+  // ============================================
+  // SIGNUP LOCATION PICKER
+  // ============================================
+  function initSignupMap() {
+    const el = document.getElementById("pickupMap"); if (!el) return;
+    const center = signupLocation.lat && signupLocation.lng ? { lat: signupLocation.lat, lng: signupLocation.lng } : { lat: 34.7717, lng: 72.3600 };
+    signupMap = new google.maps.Map(el, { center, zoom: 15, disableDefaultUI: true, zoomControl: true });
+    signupMarker = new google.maps.Marker({ position: center, map: signupMap, draggable: true, icon: { url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png" } });
+    google.maps.event.addListener(signupMarker, 'dragend', () => {
+      const pos = signupMarker.getPosition();
+      signupLocation.lat = pos.lat(); signupLocation.lng = pos.lng();
+      updateSignupStatus();
+      reverseGeocodeSignup(pos.lat(), pos.lng());
+    });
+    signupMap.addListener('click', (e) => {
+      signupMarker.setPosition(e.latLng);
+      signupLocation.lat = e.latLng.lat(); signupLocation.lng = e.latLng.lng();
+      updateSignupStatus();
+      reverseGeocodeSignup(e.latLng.lat(), e.latLng.lng());
+    });
+    updateSignupStatus();
+  }
+
+  function signupGoToMyLocation() {
+    if (!navigator.geolocation) return toast("GPS not supported");
+    toast("Getting your location...");
+    navigator.geolocation.getCurrentPosition((pos) => {
+      const lat = pos.coords.latitude, lng = pos.coords.longitude;
+      signupLocation.lat = lat; signupLocation.lng = lng;
+      if (signupMap) { signupMap.setCenter({ lat, lng }); signupMap.setZoom(17); }
+      if (signupMarker) signupMarker.setPosition({ lat, lng });
+      updateSignupStatus();
+      reverseGeocodeSignup(lat, lng);
+      toast("Location detected ✅");
+    }, (err) => { alert(err.code === 1 ? "🚫 Permission blocked. Please allow location access." : "Error: " + err.message); }, { enableHighAccuracy: true, timeout: 15000 });
+  }
+
+  function reverseGeocodeSignup(lat, lng) {
+    new google.maps.Geocoder().geocode({ location: { lat, lng } }, (results, status) => {
+      const addrInput = document.getElementById('sAddress');
+      if (status === "OK" && results[0] && results[0].formatted_address && addrInput) {
+        addrInput.value = results[0].formatted_address;
+        signupLocation.address = results[0].formatted_address;
+        updateSignupStatus();
+      }
+    });
+  }
+
+  function updateSignupStatus() {
+    const statusEl = document.getElementById("signupLocationStatus");
+    if (!statusEl) return;
+    if (signupLocation.lat && signupLocation.lng) {
+      statusEl.innerHTML = `✅ Location set: ${signupLocation.lat.toFixed(5)}, ${signupLocation.lng.toFixed(5)}`;
+      statusEl.style.color = "var(--success)";
+    } else {
+      statusEl.innerHTML = `⚠️ Click "Use My Current Location" or drag pin to set pickup location`;
+      statusEl.style.color = "var(--danger)";
     }
   }
 
@@ -344,7 +418,6 @@ p { font-size: 13px; color: var(--text-light); }
     document.getElementById('storeNameTop').textContent = state.merchant.storeName;
     render();
     toast("Welcome back, " + state.merchant.storeName + "! 🎉");
-    // FCM: register this device for push notifications
     requestFcmToken();
   }
 
@@ -369,9 +442,16 @@ p { font-size: 13px; color: var(--text-light); }
     if (!password || password.length < 6) return errBox.innerHTML = '<div class="error-msg">Password must be at least 6 characters.</div>';
     if (password !== confirm) return errBox.innerHTML = '<div class="error-msg">Passwords do not match.</div>';
     if (!address) return errBox.innerHTML = '<div class="error-msg">Address required.</div>';
+    if (!signupLocation.lat || !signupLocation.lng) return errBox.innerHTML = '<div class="error-msg">📍 Please set your store pickup location using "Use My Current Location" or pin on map.</div>';
 
     const passwordHash = await hashPassword(password);
-    state.merchant = { storeName, ownerName, phone: loginFlow.phone, email, passwordHash, securityQ1: storeName, securityQ2: ownerName, category, address, hours, deliveryArea, createdAt: new Date().toISOString() };
+    state.merchant = {
+      storeName, ownerName, phone: loginFlow.phone, email, passwordHash,
+      securityQ1: storeName, securityQ2: ownerName,
+      category, address, hours, deliveryArea,
+      location: { lat: signupLocation.lat, lng: signupLocation.lng },
+      createdAt: new Date().toISOString()
+    };
     state.products = [];
     try {
       await setDoc(doc(db, "merchants", loginFlow.phone), { merchant: state.merchant, products: [], updatedAt: new Date().toISOString() });
@@ -380,7 +460,6 @@ p { font-size: 13px; color: var(--text-light); }
       document.getElementById('storeNameTop').textContent = state.merchant.storeName;
       render();
       toast("Business registered! 🎉");
-      // FCM: register this device for push notifications
       requestFcmToken();
     } catch (e) { console.error(e); errBox.innerHTML = '<div class="error-msg">Failed to register. Try again.</div>'; }
   }
@@ -450,7 +529,9 @@ p { font-size: 13px; color: var(--text-light); }
     const todayCommission = Math.round(todaySales * (state.commissionRate / 100));
     const todayNet = todaySales - todayCommission;
     const pendingCount = state.orders.filter(o => o.status === "Placed").length;
+    const hasLocation = state.merchant.location && state.merchant.location.lat;
     return `<h2>Welcome, ${state.merchant.storeName}</h2>
+      ${!hasLocation ? `<div class="card" style="background:#fee2e2;border-left:4px solid var(--danger);"><p style="font-size:13px;color:#991b1b;font-weight:600;">⚠️ Store pickup location not set! Go to Profile → Update Location to enable rider navigation.</p></div>` : ''}
       ${pendingCount > 0 ? `<div class="card order-card new" onclick="state.tab='orders';render();" style="cursor:pointer;"><div style="display:flex;justify-content:space-between;align-items:center;"><div><h3 style="color:var(--danger);">🔔 ${pendingCount} New Order${pendingCount > 1 ? 's' : ''}!</h3><p style="margin-top:4px;">Tap to accept</p></div><div style="font-size:24px;">→</div></div></div>` : ''}
       <div class="stat-grid">
         <div class="stat-box accent"><div class="num">Rs ${todayNet}</div><div class="lbl">Today (After Commission)</div></div>
@@ -550,12 +631,15 @@ p { font-size: 13px; color: var(--text-light); }
   function renderProfile() {
     if (!state.merchant) return renderLoginPrompt();
     const cat = CATEGORIES.find(c => c.key === state.merchant.category) || CATEGORIES[5];
+    const hasLocation = state.merchant.location && state.merchant.location.lat;
+    const locDisplay = hasLocation ? `✅ ${state.merchant.location.lat.toFixed(5)}, ${state.merchant.location.lng.toFixed(5)}` : '⚠️ Not set';
     return `<div class="card"><div style="display:flex;align-items:center;gap:16px;"><div style="width:60px;height:60px;border-radius:14px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;">${cat.emoji}</div><div><h3>${state.merchant.storeName}</h3><p style="font-size:13px;color:var(--text-light);">${state.merchant.phone}</p><p style="font-size:12px;color:var(--accent);margin-top:2px;">${cat.label}</p></div></div></div>
     <div class="card">
       <div class="order-row" style="cursor:pointer;padding:14px 0;border-bottom:1px solid var(--border);" onclick="editStore()"><span>🏪 Store Name</span><span style="color:var(--text-light);font-size:12px;">${state.merchant.storeName} ›</span></div>
       <div class="order-row" style="padding:14px 0;border-bottom:1px solid var(--border);"><span>👤 Owner</span><span style="color:var(--text-light);font-size:12px;">${state.merchant.ownerName || 'Not set'}</span></div>
       <div class="order-row" style="padding:14px 0;border-bottom:1px solid var(--border);"><span>✉️ Email</span><span style="color:var(--text-light);font-size:12px;">${state.merchant.email || 'Not set'}</span></div>
       <div class="order-row" style="padding:14px 0;border-bottom:1px solid var(--border);"><span>📍 Address</span><span style="color:var(--text-light);font-size:12px;text-align:right;max-width:60%;">${state.merchant.address || 'Not set'}</span></div>
+      <div class="order-row" style="cursor:pointer;padding:14px 0;border-bottom:1px solid var(--border);" onclick="editPickupLocation()"><span>🎯 Pickup Location</span><span style="color:${hasLocation ? 'var(--success)' : 'var(--danger)'};font-size:11px;font-weight:600;">${locDisplay} ›</span></div>
       <div class="order-row" style="cursor:pointer;padding:14px 0;border-bottom:1px solid var(--border);" onclick="editHours()"><span>🕒 Hours</span><span style="color:var(--text-light);font-size:12px;">${state.merchant.hours || 'Not set'} ›</span></div>
       <div class="order-row" style="cursor:pointer;padding:14px 0;" onclick="editDeliveryArea()"><span>🗺️ Delivery Area</span><span style="color:var(--text-light);font-size:12px;">${state.merchant.deliveryArea || 'Not set'} ›</span></div>
     </div>
@@ -567,23 +651,113 @@ p { font-size: 13px; color: var(--text-light); }
   function editHours() { const hours = prompt("Hours:", state.merchant.hours || ""); if (!hours) return; state.merchant.hours = hours; saveLocal(); saveMerchantToFirebase(); render(); toast("Updated"); }
   function editDeliveryArea() { const area = prompt("Delivery Area:", state.merchant.deliveryArea || ""); if (!area) return; state.merchant.deliveryArea = area; saveLocal(); saveMerchantToFirebase(); render(); toast("Updated"); }
 
+  // ============================================
+  // EDIT PICKUP LOCATION
+  // ============================================
+  let editMap = null, editMarker = null;
+  let editLocation = { lat: null, lng: null };
+
+  function editPickupLocation() {
+    if (!state.merchant) return;
+    editLocation.lat = state.merchant.location?.lat || null;
+    editLocation.lng = state.merchant.location?.lng || null;
+    document.getElementById("modalRoot").innerHTML = `<div class="overlay" onclick="if(event.target===this)closeModal()"><div class="sheet"><h3>🎯 Store Pickup Location</h3>
+      <p style="font-size:12px;color:var(--text-light);margin-bottom:12px;">Riders will navigate to this exact location to pick up orders.</p>
+      <button type="button" class="btn btn-success btn-block" onclick="editGoToMyLocation()" style="margin-bottom:10px;">📍 Use My Current Location</button>
+      <div id="editPickupMap" style="width:100%;height:240px;border-radius:12px;margin-bottom:8px;background:var(--bg);"></div>
+      <p style="font-size:11px;text-align:center;color:var(--text-light);margin-bottom:12px;">🔴 Drag pin or tap map to adjust</p>
+      <label style="display:block;font-size:12px;color:var(--text-light);margin-bottom:4px;">Store Address</label>
+      <input id="editAddrDetails" placeholder="Store address" value="${state.merchant.address || ''}" style="width:100%;padding:14px;border:1px solid var(--border);border-radius:12px;font-size:14px;margin-bottom:12px;" />
+      <div id="editLocationStatus" style="font-size:12px;color:var(--text-light);margin-bottom:12px;"></div>
+      <button class="btn btn-primary btn-block" onclick="savePickupLocation()">Save Location</button>
+      <button class="btn btn-outline btn-block" style="margin-top:8px;" onclick="closeModal()">Cancel</button>
+    </div></div>`;
+    setTimeout(() => initEditMap(), 200);
+  }
+
+  function initEditMap() {
+    const el = document.getElementById("editPickupMap"); if (!el) return;
+    const center = editLocation.lat && editLocation.lng ? { lat: editLocation.lat, lng: editLocation.lng } : { lat: 34.7717, lng: 72.3600 };
+    editMap = new google.maps.Map(el, { center, zoom: 15, disableDefaultUI: true, zoomControl: true });
+    editMarker = new google.maps.Marker({ position: center, map: editMap, draggable: true, icon: { url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png" } });
+    google.maps.event.addListener(editMarker, 'dragend', () => {
+      const pos = editMarker.getPosition();
+      editLocation.lat = pos.lat(); editLocation.lng = pos.lng();
+      updateEditStatus();
+      new google.maps.Geocoder().geocode({ location: { lat: pos.lat(), lng: pos.lng() } }, (results, status) => {
+        const addrInput = document.getElementById('editAddrDetails');
+        if (status === "OK" && results[0] && results[0].formatted_address && addrInput) addrInput.value = results[0].formatted_address;
+      });
+    });
+    editMap.addListener('click', (e) => {
+      editMarker.setPosition(e.latLng);
+      editLocation.lat = e.latLng.lat(); editLocation.lng = e.latLng.lng();
+      updateEditStatus();
+      new google.maps.Geocoder().geocode({ location: { lat: e.latLng.lat(), lng: e.latLng.lng() } }, (results, status) => {
+        const addrInput = document.getElementById('editAddrDetails');
+        if (status === "OK" && results[0] && results[0].formatted_address && addrInput) addrInput.value = results[0].formatted_address;
+      });
+    });
+    updateEditStatus();
+  }
+
+  function editGoToMyLocation() {
+    if (!navigator.geolocation) return toast("GPS not supported");
+    toast("Getting location...");
+    navigator.geolocation.getCurrentPosition((pos) => {
+      const lat = pos.coords.latitude, lng = pos.coords.longitude;
+      editLocation.lat = lat; editLocation.lng = lng;
+      if (editMap) { editMap.setCenter({ lat, lng }); editMap.setZoom(17); }
+      if (editMarker) editMarker.setPosition({ lat, lng });
+      updateEditStatus();
+      new google.maps.Geocoder().geocode({ location: { lat, lng } }, (results, status) => {
+        const addrInput = document.getElementById('editAddrDetails');
+        if (status === "OK" && results[0] && results[0].formatted_address && addrInput) addrInput.value = results[0].formatted_address;
+      });
+      toast("Location detected ✅");
+    }, (err) => { alert(err.code === 1 ? "🚫 Permission blocked." : "Error: " + err.message); }, { enableHighAccuracy: true, timeout: 15000 });
+  }
+
+  function updateEditStatus() {
+    const el = document.getElementById("editLocationStatus"); if (!el) return;
+    if (editLocation.lat && editLocation.lng) {
+      el.innerHTML = `✅ Location: ${editLocation.lat.toFixed(5)}, ${editLocation.lng.toFixed(5)}`;
+      el.style.color = "var(--success)";
+    } else {
+      el.innerHTML = `⚠️ No location set`;
+      el.style.color = "var(--danger)";
+    }
+  }
+
+  async function savePickupLocation() {
+    if (!editLocation.lat || !editLocation.lng) return toast("Please set pickup location");
+    const addr = document.getElementById('editAddrDetails').value.trim();
+    state.merchant.location = { lat: editLocation.lat, lng: editLocation.lng };
+    if (addr) state.merchant.address = addr;
+    saveLocal();
+    await saveMerchantToFirebase();
+    closeModal();
+    render();
+    toast("Pickup location saved ✅");
+  }
+
   function renderLoginPrompt() { return `<div class="card" style="text-align:center;padding:40px 20px;"><div style="font-size:64px;margin-bottom:16px;">🏪</div><h3 style="margin-bottom:8px;">Welcome to SwatGo Merchant</h3><p style="color:var(--text-light);font-size:13px;margin-bottom:20px;">Register your business</p><button class="btn btn-primary btn-block" onclick="openAuth()">Login / Register</button></div>`; }
 
   async function saveMerchantToFirebase() { if (!state.merchant) return; try { await setDoc(doc(db, "merchants", state.merchant.phone), { merchant: state.merchant, products: state.products, updatedAt: new Date().toISOString() }, { merge: true }); } catch (e) { console.error(e); } }
 
-  async function logout() { 
-    if (!confirm("Logout?")) return; 
+  async function logout() {
+    if (!confirm("Logout?")) return;
     await removeFcmToken();
-    if (state.ordersListener) { state.ordersListener(); state.ordersListener = null; } 
-    if (state.payoutsListener) { state.payoutsListener(); state.payoutsListener = null; } 
-    if (state.settingsListener) { state.settingsListener(); state.settingsListener = null; } 
-    state.merchant = null; state.orders = []; state.products = []; state.payouts = []; state.isOpen = false; 
-    localStorage.clear(); 
-    document.getElementById('storeNameTop').textContent = "SwatGo Merchant"; 
-    updateOpenStatus(); 
-    state.tab = "home"; 
-    render(); 
-    toast("Logged out"); 
+    if (state.ordersListener) { state.ordersListener(); state.ordersListener = null; }
+    if (state.payoutsListener) { state.payoutsListener(); state.payoutsListener = null; }
+    if (state.settingsListener) { state.settingsListener(); state.settingsListener = null; }
+    state.merchant = null; state.orders = []; state.products = []; state.payouts = []; state.isOpen = false;
+    localStorage.clear();
+    document.getElementById('storeNameTop').textContent = "SwatGo Merchant";
+    updateOpenStatus();
+    state.tab = "home";
+    render();
+    toast("Logged out");
   }
 
   function render() {
@@ -615,6 +789,8 @@ p { font-size: 13px; color: var(--text-light); }
   window.startPasswordReset = startPasswordReset; window.resetSubmitPhone = resetSubmitPhone;
   window.resetSubmitEmail = resetSubmitEmail; window.resetSubmitQuestions = resetSubmitQuestions;
   window.resetSaveNewPassword = resetSaveNewPassword;
+  window.signupGoToMyLocation = signupGoToMyLocation;
+  window.editPickupLocation = editPickupLocation; window.editGoToMyLocation = editGoToMyLocation; window.savePickupLocation = savePickupLocation;
 </script>
 </body>
 </html>
